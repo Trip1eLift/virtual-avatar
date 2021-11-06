@@ -12,7 +12,7 @@ PORT = 5001
 latestClient = {}
 
 # Websocket server docs: https://github.com/Pithikos/python-websocket-server
-def main():
+def test():
     server = WebsocketServer(host=HOST, port=PORT)
 
     def new_client(client, server):
@@ -26,14 +26,25 @@ def main():
 
         while client['id'] == latestClient['id']:
             count = count + 1
-            pack = {'count': count, 'data': data}
-            jsonPack = json.dumps(pack)
+            frame_pack = {
+                'fps': 1, 
+                'frame': count, 
+                'payload': {
+                    'landmarks': [
+                        {'x': 1, 'y': 1, 'z': 1},
+                        {'x': 2, 'y': 2, 'z': 2}
+                    ]
+                }
+            }
+            jsonPack = json.dumps(frame_pack)
             server.send_message(latestClient, jsonPack)
             sleep(1)
         return
     
     server.set_fn_new_client(new_client)
     server.run_forever()
+
+    return 'TERMINATE'
 
     
 def WebSocket_face_mesh_trace_json():
@@ -58,7 +69,7 @@ def WebSocket_face_mesh_trace_json():
             if not success:
                 print("Can't receive frame (stream end?). Exiting ...")
                 break
-            frame = frame[90:390, 170:470]
+            #frame = frame[90:390, 170:470]
             frame = cv2.flip(frame, 1)
             frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = faceMesh.process(frameRGB)
@@ -71,8 +82,9 @@ def WebSocket_face_mesh_trace_json():
                 package = []
                 for index, mark in enumerate(results.multi_face_landmarks[0].landmark):
                     landmark = {'x': mark.x, 'y': mark.y, 'z': mark.z}
-                    package.append({"landmark": landmark})
-                frame_pack = {'fps': fps, 'frame': frame_count, 'payload': package}
+                    package.append(landmark)
+                payload = {'landmarks': package}
+                frame_pack = {'fps': fps, 'frame': frame_count, 'payload': payload}
                 print("frame:", frame_pack['frame'], "fps:", frame_pack['fps'])
                 jsonPack = json.dumps(frame_pack)
 
@@ -87,13 +99,7 @@ def WebSocket_face_mesh_trace_json():
 
     return 'TERMINATE'
 
-        
-
-        
-
-    server.run_forever()
-
-    return 'TERMINATE'
 
 if __name__ == "__main__":
-    main()
+    test()
+    #WebSocket_face_mesh_trace_json()

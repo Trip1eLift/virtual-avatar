@@ -12,7 +12,7 @@ PORT = 5001
 latestClient = {}
 
 # Websocket server docs: https://github.com/Pithikos/python-websocket-server
-def test():
+def WStest():
     server = WebsocketServer(host=HOST, port=PORT)
 
     def new_client(client, server):
@@ -45,6 +45,28 @@ def test():
     server.run_forever()
 
     return 'TERMINATE'
+
+def MediaPipeTest():
+    vid = cv2.VideoCapture(0)
+    if not vid.isOpened():
+        print("Cannot open camera")
+        exit()
+
+    mpFaceMesh = mp.solutions.face_mesh
+    faceMesh = mpFaceMesh.FaceMesh(max_num_faces=1)
+
+    while True:
+        success, frame = vid.read()
+        if not success:
+            print("Can't receive frame (stream end?). Exiting ...")
+            break
+        #frame = frame[90:390, 170:470]
+        frame = cv2.flip(frame, 1)
+        frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = faceMesh.process(frameRGB)
+
+        if results.multi_face_landmarks:
+            print(results)
 
     
 def WebSocket_face_mesh_trace_json():
@@ -101,5 +123,6 @@ def WebSocket_face_mesh_trace_json():
 
 
 if __name__ == "__main__":
-    test()
-    #WebSocket_face_mesh_trace_json()
+    #MediaPipeTest()
+    #WStest()
+    WebSocket_face_mesh_trace_json()

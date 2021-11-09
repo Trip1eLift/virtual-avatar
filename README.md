@@ -15,7 +15,7 @@ where.exe python
 where.exe python
 ```
 
-Operation in venv
+Operations in venv
 ```console
 pip list
 py -m pip install -r requirements.txt

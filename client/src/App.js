@@ -42,7 +42,7 @@ export default function App() {
     return (
       <group >
       <group scale={[1.5 * expand, expand, expand]}>
-        <mesh position={[-4.83, 6.1, -2]} scale={10} rotation={new THREE.Euler(-0.3, 3.16, 3.15, 'ZYX')}>
+        <mesh position={[-4.60, 6.1, -2]} scale={10} rotation={new THREE.Euler(-0.3, 3.16, 3.12, 'ZYX')}>
           <bufferGeometry>
             <bufferAttribute
               attachObject={["attributes", "position"]}
@@ -51,7 +51,6 @@ export default function App() {
               count={count}
             />
           </bufferGeometry>
-          
           <meshStandardMaterial
             attach="material"
             color="hotpink"
@@ -74,7 +73,7 @@ export default function App() {
 
   return (
     <>
-    <div>HELLO WORLD</div>
+    <div>RIGHT CLICK AREA</div>
       <Canvas>
         <OrbitControls />
         <ambientLight intensity={0.1} />

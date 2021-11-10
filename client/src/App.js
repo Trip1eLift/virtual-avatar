@@ -2,11 +2,11 @@ import './App.css';
 import React, {useEffect, useState} from 'react';
 import mock_data from './landmarks-payload.json';
 import Landmarks_to_triangles from './landmarks2triangle';
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from '@react-three/drei';
-import './styles.css';
-import * as THREE from 'three'
-//import { useUpdate } from "@react-three/cannon";
+import { Canvas, extend } from "@react-three/fiber";
+import { OrbitControls, shaderMaterial } from '@react-three/drei';
+import './Scene.css';
+import * as THREE from 'three';
+import glsl from 'babel-plugin-glsl/macro';
 
 const server_url = 'ws://127.0.0.1:5001';
 export default function App() {
@@ -24,13 +24,10 @@ export default function App() {
     //client.send(JSON.stringify({body: "nothing"}));
 
     client.onmessage = ((msg) => {
-      //console.log(msg);
-      //console.log(msg.data);
       const data = JSON.parse(msg.data);
       console.log(data.frame);
       setLandmarks(data.payload.landmarks);
       //console.log(data.payload.landmarks.length)
-      //console.log(JSON.stringify(data.payload.landmarks));
     });
   }, []);
   
@@ -62,6 +59,72 @@ export default function App() {
     )
   }
 
+  function Square() {
+    const vertices = new Float32Array([
+      0.0, 0.0,  0.0,
+      1.0, 0.0,  0.0,
+      0.0, 1.0,  0.0,
+        
+      1.0, 0.0,  0.0,
+      1.0, 1.0,  0.0,
+      0.0, 1.0,  0.0
+    ]);
+
+    const colors = new Float32Array([
+      1.0, 0.0, 0.0,
+      0.0, 1.0, 0.0,
+      0.0, 0.0, 1.0,
+
+      1.0, 0.0, 0.0,
+      0.0, 1.0, 0.0,
+      0.0, 0.0, 1.0,
+    ]);
+    
+    return (
+      <mesh>
+        <bufferGeometry>
+          <bufferAttribute
+            attachObject={["attributes", "position"]}
+            array={vertices}
+            itemSize={3}
+            count={6}
+          />
+          <bufferAttribute
+            attachObject={["attributes", "color"]}
+            array={colors}
+            itemSize={3}
+            count={6}
+          />
+        </bufferGeometry>
+        
+      </mesh>
+    );
+  }
+
+  function ShaderPractice() {
+    const WaveShaderMaterial = shaderMaterial(
+      // Uniform
+      {},
+      // Vertex Shader
+      glsl`
+        void main() {
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(possition, 1.0);
+        }
+      `,
+      // Fragment Shader
+      glsl``
+    );
+
+    extend({ WaveShaderMaterial });
+
+    return (
+      <mesh>
+        <planeBufferGeometry args={[3, 5]} />
+        <waveShaderMaterial color="lightblue" />
+      </mesh>
+    )
+  }
+
   function Box() {
     return (
       <mesh>
@@ -79,9 +142,18 @@ export default function App() {
         <ambientLight intensity={0.1} />
         <spotLight position={[10, 15, 20]} angle={0.5} intensity={0.8}/>
         <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
-        <Facemesh />
+        
+        <ShaderPractice />
       </Canvas>
     </>
   );
 }
 
+
+/**
+ * Texture mapping:
+ * https://docs.pmnd.rs/react-three-fiber/tutorials/loading-textures
+ * 
+ * Shader tutorial: 11:50
+ * https://www.youtube.com/watch?v=kxXaIHi1j4w
+ */

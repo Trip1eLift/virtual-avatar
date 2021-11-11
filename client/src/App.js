@@ -1,14 +1,14 @@
-import './App.css';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef, Suspense} from 'react';
 import mock_data from './landmarks-payload.json';
 import Landmarks_to_triangles from './landmarks2triangle';
-import { Canvas, extend } from "@react-three/fiber";
-import { OrbitControls, shaderMaterial } from '@react-three/drei';
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from '@react-three/drei';
 import './Scene.css';
 import * as THREE from 'three';
-import glsl from 'babel-plugin-glsl/macro';
+import ShaderPractice from './shaderPractice';
 
 const server_url = 'ws://127.0.0.1:5001';
+
 export default function App() {
 
   const l2t = new Landmarks_to_triangles();
@@ -100,30 +100,7 @@ export default function App() {
       </mesh>
     );
   }
-
-  function ShaderPractice() {
-    const WaveShaderMaterial = shaderMaterial(
-      // Uniform
-      {},
-      // Vertex Shader
-      glsl`
-        void main() {
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(possition, 1.0);
-        }
-      `,
-      // Fragment Shader
-      glsl``
-    );
-
-    extend({ WaveShaderMaterial });
-
-    return (
-      <mesh>
-        <planeBufferGeometry args={[3, 5]} />
-        <waveShaderMaterial color="lightblue" />
-      </mesh>
-    )
-  }
+  
 
   function Box() {
     return (
@@ -142,18 +119,12 @@ export default function App() {
         <ambientLight intensity={0.1} />
         <spotLight position={[10, 15, 20]} angle={0.5} intensity={0.8}/>
         <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
-        
-        <ShaderPractice />
+        <Suspense fallback={null}>
+          <ShaderPractice />
+        </Suspense>
       </Canvas>
     </>
   );
 }
 
 
-/**
- * Texture mapping:
- * https://docs.pmnd.rs/react-three-fiber/tutorials/loading-textures
- * 
- * Shader tutorial: 11:50
- * https://www.youtube.com/watch?v=kxXaIHi1j4w
- */

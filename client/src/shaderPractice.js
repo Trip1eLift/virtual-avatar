@@ -2,7 +2,7 @@
  * Texture mapping:
  * https://docs.pmnd.rs/react-three-fiber/tutorials/loading-textures
  * 
- * Shader tutorial: 11:50
+ * Shader tutorial:
  * https://www.youtube.com/watch?v=kxXaIHi1j4w
  */
 

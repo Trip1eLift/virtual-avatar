@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef, Suspense} from 'react';
+import React, {useEffect, useState, Suspense} from 'react';
 import mock_data from './landmarks-payload.json';
 import Landmarks_to_triangles from './landmarks2triangle';
 import { Canvas } from "@react-three/fiber";
@@ -35,26 +35,36 @@ export default function App() {
   function Facemesh() {
     const [dbPoints, itemSize, count] = l2t.map2DoublePoints(landmarks);
     
+    let envPosition = [0.0, 0.0, 0.0];
+    let envRotation = new THREE.Euler(0.0, 0.0, 0.0, 'XYZ');
+    let envXscale = 1.5;
+    if (process.env.REACT_APP_ENV !== undefined) {
+      const ENV = process.env;
+      envXscale = ENV.REACT_APP_X_scale;
+      envPosition = [ENV.REACT_APP_X_translate, ENV.REACT_APP_Y_translate, ENV.REACT_APP_Z_translate];
+      envRotation = new THREE.Euler(ENV.REACT_APP_X_rotation, ENV.REACT_APP_Y_rotation, ENV.REACT_APP_Z_rotation, 'XYZ');
+    }
+
     const expand = 1.5;
     return (
       <group >
-      <group scale={[1.5 * expand, expand, expand]}>
-        <mesh position={[-4.60, 6.1, -2]} scale={10} rotation={new THREE.Euler(-0.3, 3.16, 3.12, 'ZYX')}>
-          <bufferGeometry>
-            <bufferAttribute
-              attachObject={["attributes", "position"]}
-              array={dbPoints}
-              itemSize={itemSize}
-              count={count}
+        <group scale={[envXscale * expand, expand, expand]} position={envPosition} rotation={envRotation}>
+          <mesh position={[-4.60, 6.1, -2]} scale={10} rotation={new THREE.Euler(-0.3, 3.16, 3.12, 'ZYX')}>
+            <bufferGeometry>
+              <bufferAttribute
+                attachObject={["attributes", "position"]}
+                array={dbPoints}
+                itemSize={itemSize}
+                count={count}
+              />
+            </bufferGeometry>
+            <meshStandardMaterial
+              attach="material"
+              color="hotpink"
+              flatShading={true}
             />
-          </bufferGeometry>
-          <meshStandardMaterial
-            attach="material"
-            color="hotpink"
-            flatShading={true}
-          />
-        </mesh>
-      </group>
+          </mesh>
+        </group>
       </group>
     )
   }

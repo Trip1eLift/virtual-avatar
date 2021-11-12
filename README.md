@@ -11,14 +11,15 @@ python3 -m venv ./venv
 To activate
 ```console
 where.exe python
-./venv/Scripts/activate
+./venv/Scripts/activate     (Windows)
+source ./venv/bin/activate  (Mac)
 where.exe python
 ```
 
 Operations in venv
 ```console
 pip list
-py -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ```console

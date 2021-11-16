@@ -1,5 +1,4 @@
 import vertices_mapping from './facemesh_vertices_mapping.json';
-import * as THREE from 'three';
 
 class Landmarks_to_triangles {
     constructor() {

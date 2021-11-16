@@ -9,11 +9,11 @@
 import React, { useRef } from 'react';
 import { extend, useFrame, useLoader } from "@react-three/fiber";
 import { shaderMaterial } from '@react-three/drei';
-
 import * as THREE from 'three';
 import glsl from 'babel-plugin-glsl/macro';
 
 export default function  ShaderPractice() {
+    // Note: the name must be <Somthing>ShaderMaterial
     const WaveShaderMaterial = shaderMaterial(
       // Uniform -> Allow to pass data from react component to glsl
       {
@@ -72,7 +72,7 @@ export default function  ShaderPractice() {
     return (
       <mesh>
         <planeBufferGeometry args={[0.4, 0.6, 16, 16]} />
-        <waveShaderMaterial uColor="hotpink" ref={ref} uTexture={image}/>
+        <waveShaderMaterial uColor="hotpink" ref={ref} uTexture={image} wireframe/>
       </mesh>
     )
   }

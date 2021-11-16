@@ -6,6 +6,7 @@ import { OrbitControls } from '@react-three/drei';
 import './Scene.css';
 import * as THREE from 'three';
 import ShaderPractice from './shaderPractice';
+import Square from './Square';
 
 const server_url = 'ws://127.0.0.1:5001';
 
@@ -69,49 +70,6 @@ export default function App() {
     )
   }
 
-  function Square() {
-    const vertices = new Float32Array([
-      0.0, 0.0,  0.0,
-      1.0, 0.0,  0.0,
-      0.0, 1.0,  0.0,
-        
-      1.0, 0.0,  0.0,
-      1.0, 1.0,  0.0,
-      0.0, 1.0,  0.0
-    ]);
-
-    const colors = new Float32Array([
-      1.0, 0.0, 0.0,
-      0.0, 1.0, 0.0,
-      0.0, 0.0, 1.0,
-
-      1.0, 0.0, 0.0,
-      0.0, 1.0, 0.0,
-      0.0, 0.0, 1.0,
-    ]);
-    
-    return (
-      <mesh>
-        <bufferGeometry>
-          <bufferAttribute
-            attachObject={["attributes", "position"]}
-            array={vertices}
-            itemSize={3}
-            count={6}
-          />
-          <bufferAttribute
-            attachObject={["attributes", "color"]}
-            array={colors}
-            itemSize={3}
-            count={6}
-          />
-        </bufferGeometry>
-        
-      </mesh>
-    );
-  }
-  
-
   function Box() {
     return (
       <mesh>
@@ -129,8 +87,9 @@ export default function App() {
         <ambientLight intensity={0.1} />
         <spotLight position={[10, 15, 20]} angle={0.5} intensity={0.8}/>
         <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
+        
         <Suspense fallback={null}>
-          <ShaderPractice />
+          <Square />
         </Suspense>
       </Canvas>
     </>

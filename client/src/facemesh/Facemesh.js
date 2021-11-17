@@ -11,11 +11,14 @@ export default function Facemesh({landmarks}) {
   if (landmarks === undefined)
     landmarks = mock_data;
 
-  const [dbPoints, itemSize, count] = l2t.map2DoublePoints(landmarks);
+  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks);
 
   // setAttribute force upload to GPU on hook
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(dbPoints, itemSize, false));
+  //geometry.setAttribute("normal",  new THREE.BufferAttribute(normals, itemSize, true));
+  geometry.setAttribute("color",  new THREE.BufferAttribute(colors, itemSize, false));
+
   extend({ CustomShaderMaterial });
 
 
@@ -37,9 +40,12 @@ export default function Facemesh({landmarks}) {
           position={[-4.60, 6.1, -2]} scale={10} rotation={new THREE.Euler(-0.3, 3.16, 3.12, 'ZYX')}
           geometry={geometry}
         >
-					<meshStandardMaterial attach="material" color="hotpink" flatShading={true} />
+					<meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
         </mesh>
       </group>
     </group>
   );
 }
+
+// <customShaderMaterial />
+// <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />

@@ -11,9 +11,11 @@ const CustomShaderMaterial = shaderMaterial(
     glsl`
         attribute vec3 color;
         varying lowp vec3 vColor;
+        //varying lowp vec3 vNormal;
         void main() {
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
             vColor = color;
+            //vNormal = normal;
         }
     `,
     // Fragment Shader -> Color the polygon surface
@@ -21,9 +23,20 @@ const CustomShaderMaterial = shaderMaterial(
         varying lowp vec3 vColor;
         uniform vec3 uColor;
         void main() {
-            gl_FragColor = vec4(uColor, 1.0);
+            gl_FragColor = vec4(vColor, 1.0);
         }
     `
 );
 
 export default CustomShaderMaterial;
+
+/**
+ * Documentation: https://threejs.org/docs/#api/en/renderers/webgl/WebGLProgram
+ * 
+ * default vertex attributes provided by Geometry and BufferGeometry
+ * attribute vec3 position;
+ * attribute vec3 normal;
+ * attribute vec2 uv;
+ * 
+ * 
+ */

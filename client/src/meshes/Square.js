@@ -1,4 +1,3 @@
-import React from 'react';
 import { extend } from "@react-three/fiber";
 import { shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
@@ -81,4 +80,18 @@ export default function Square() {
  * attribute vec3 position;
  * attribute vec3 normal;
  * attribute vec2 uv;
+ * 
+ * 
+ * Alternative way of setting mesh:
+ * 
+ * const geometry = new THREE.BufferGeometry();
+ * geometry.setAttribute("position", new THREE.BufferAttribute(dbPoints, 3, false));
+ * const mat = new THREE.MeshStandardMaterial({color:"hotpink", flatShading:true});
+ * 
+ * return (
+ *    <mesh
+ *      geometry={geometry}
+ *      material={mat}
+ *    />
+ * )
  */

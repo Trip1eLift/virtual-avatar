@@ -26,7 +26,7 @@ export default function App() {
 
     client.onmessage = ((msg) => {
       const data = JSON.parse(msg.data);
-      console.log(data.frame);
+      //console.log(data.frame);
       setLandmarks(data.payload.landmarks);
       //console.log(data.payload.landmarks.length)
     });

@@ -69,7 +69,7 @@ def MediaPipeTest():
             print(results)
 
     
-def WebSocket_face_mesh_trace_json():
+def WebSocket_face_mesh_trace_json(flip = True):
     server = WebsocketServer(host=HOST, port=PORT)
 
     def new_client(client, server):
@@ -92,7 +92,8 @@ def WebSocket_face_mesh_trace_json():
                 print("Can't receive frame (stream end?). Exiting ...")
                 break
             #frame = frame[90:390, 170:470]
-            frame = cv2.flip(frame, 1)
+            if flip:
+                frame = cv2.flip(frame, 1)
             frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = faceMesh.process(frameRGB)
 
@@ -107,7 +108,7 @@ def WebSocket_face_mesh_trace_json():
                     package.append(landmark)
                 payload = {'landmarks': package}
                 frame_pack = {'fps': fps, 'frame': frame_count, 'payload': payload}
-                print("frame:", frame_pack['frame'], "fps:", frame_pack['fps'])
+                #print("frame:", frame_pack['frame'], "fps:", frame_pack['fps'])
                 jsonPack = json.dumps(frame_pack)
 
                 server.send_message(client, jsonPack)

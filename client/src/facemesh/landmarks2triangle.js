@@ -7,32 +7,6 @@ class Landmarks_to_triangles {
         this.vmp = vertices_mapping;
     }
 
-    printVMP() {
-        console.log(this.vmp)
-    }
-
-    helloworldSquare() {
-        const points = new Float32Array([
-            0.0, 0.0,  0.0,
-            1.0, 0.0,  0.0,
-            0.0, 1.0,  0.0,
-              
-            1.0, 0.0,  0.0,
-            1.0, 1.0,  0.0,
-            0.0, 1.0,  0.0
-        ]);
-        return points;
-    }
-
-    testTriangle() {
-        const points = new Float32Array([
-            4.121029853820801, 5.969240188598633, 0.5103283524513245,
-            4.131828308105469, 6.020913600921631, 0.3072405159473419,
-            4.150081634521484, 5.867887496948242, 0.20225486159324646
-        ]);
-        return this.doubleSidedPoints(points);
-    }
-
     map2DoublePoints(landmarks) {
         let points = new Float32Array(this.vmp.length * 3 * 3);
         const scale = 1;
@@ -85,7 +59,7 @@ class Landmarks_to_triangles {
         const skin_1 = ["hotpink", "skyblue", "yellow", "red", "yellowgreen", "pink", "orange"];
         const skin_2 = ["orange", "yellowgreen", "yellow"];
         const skin_3 = ["hotpink", "skyblue", "pink"];
-        const color_list = skin_3;
+        const color_list = skin_2;
 
         if (mixed === false) {
             const randIntList = this.getRandomIntArray(count / 3); // aka 1704

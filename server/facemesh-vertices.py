@@ -13,16 +13,17 @@ def vertices_generate():
     success = True
     for pair in Connections:
         if count % 3 == 0:
-            if count != 0:
-                if three_pair[0][0] != three_pair[2][1] or three_pair[0][1] != three_pair[1][0] or three_pair[1][1] != three_pair[2][0]:
-                    print("Error", three_pair)
-                    success = False
-                else:
-                    vertices.append([three_pair[0][0], three_pair[1][0], three_pair[2][0]])
             three_pair = []
             three_pair.append(pair)
-        else:
+        elif count % 3 == 1:
             three_pair.append(pair)
+        elif count % 3 == 2:
+            three_pair.append(pair)
+            if three_pair[0][0] != three_pair[2][1] or three_pair[0][1] != three_pair[1][0] or three_pair[1][1] != three_pair[2][0]:
+                print("Error", three_pair)
+                success = False
+            else:
+                vertices.append([three_pair[0][0], three_pair[1][0], three_pair[2][0]])
         #print(pair)
         count = count + 1
 

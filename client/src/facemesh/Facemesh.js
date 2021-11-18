@@ -1,22 +1,27 @@
-import { extend } from "@react-three/fiber";
 import * as THREE from 'three';
 import mock_data from './landmarks-mock.json';
-import CustomShaderMaterial from './shader';
 import Landmarks_to_triangles from './landmarks2triangle';
-
+import CustomShaderMaterial from './shader';
+import { extend } from "@react-three/fiber";
 
 const l2t = new Landmarks_to_triangles();
+let geometry;
 
 export default function Facemesh({landmarks}) {
   if (landmarks === undefined)
     landmarks = mock_data;
 
-  const [dbPoints, itemSize, count] = l2t.map2DoublePoints(landmarks);
+  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks);
 
   // setAttribute force upload to GPU on hook
-  const geometry = new THREE.BufferGeometry();
+  if (geometry !== undefined)
+    geometry.dispose();
+  geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(dbPoints, itemSize, false));
-  extend({ CustomShaderMaterial });
+  //geometry.setAttribute("normal",  new THREE.BufferAttribute(normals, itemSize, true));
+  geometry.setAttribute("color",  new THREE.BufferAttribute(colors, itemSize, false));
+
+  //extend({ CustomShaderMaterial });
 
 
   // Adjust position and rotation
@@ -37,9 +42,12 @@ export default function Facemesh({landmarks}) {
           position={[-4.60, 6.1, -2]} scale={10} rotation={new THREE.Euler(-0.3, 3.16, 3.12, 'ZYX')}
           geometry={geometry}
         >
-					<meshStandardMaterial attach="material" color="hotpink" flatShading={true} />
+					<meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
         </mesh>
       </group>
     </group>
   );
 }
+
+// <customShaderMaterial />
+// <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />

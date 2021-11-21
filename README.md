@@ -19,7 +19,7 @@ where.exe python
 Operations in venv
 ```console
 pip list
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ```console

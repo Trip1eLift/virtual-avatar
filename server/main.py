@@ -6,7 +6,7 @@ import time
 import cv2
 import mediapipe as mp
 
-HOST = "127.0.0.1"
+HOST = "0.0.0.0"
 PORT = 5001
 
 latestClient = {}
@@ -118,6 +118,7 @@ def WebSocket_face_mesh_trace_json(flip = True):
             #print(frame_count)
 
     server.set_fn_new_client(new_client)
+    print("Listening on: ws://" + HOST + ":" + str(PORT))
     server.run_forever()
 
     return 'TERMINATE'

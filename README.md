@@ -1,9 +1,20 @@
 # Virtual-Avatar
 This project involves a Python Server running Mediapipe with Webcam to 3D scan the face. Then send the facial landmarks to Client using websocket protocol. The Client is built on react with graphics engine @react-three/fiber that render facial landmark into browser. This project requires Python3 and Node.js to run.
 
-## Docker Start
+# Static site setup
+
+## Dev Start
+```
+cd standalone
+npm install
+npm run dev
+```
+
+# 2 tier setup using websocket
+
+## Docker Start (camera issue, docker doesn't work.)
 ```console
-docker-compose up -d
+docker-compose up -d 
 ```
 
 ## Dev Start

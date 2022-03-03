@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  server:
+    container_name: mediapipe-backend
+    image: ubuntu:latest
+    command: > 
+      sh -c "cd server
+      && apt-get update -y
+      && apt-get install -y python3
+      && apt-get install -y python3-pip
+      && pip install --upgrade pip 
+      && pip install -r requirements.txt 
+      && python3 main.py"
+    ports:
+      - 5001:5001
+    working_dir: /server
+    volumes:
+      - ./:/server
+    environment:
+      - docker_cannot_reach_webcam=https://github.com/IanPhilips/dlib-opencv/blob/master/Dockerfile.dlib.cv

@@ -5,9 +5,6 @@ import './Scene.css';
 import * as THREE from 'three';
 import Facemesh from './facemesh/Facemesh';
 import Square from './meshes/Square';
-import Landmarks_to_triangles from './facemesh/landmarks2triangle';
-
-const l2t = new Landmarks_to_triangles();
 
 const server_url = 'ws://127.0.0.1:5001';
 

@@ -4,7 +4,7 @@ A web-based virtual face renderer inspired by Vtuber.
 ## Static site setup
 Calibration is based on my personal Nexigo webcam.
 ```
-cd standalone
+cd standalone-webpack
 npm install
 npm run dev
 ```

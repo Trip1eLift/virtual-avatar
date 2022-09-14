@@ -13,6 +13,22 @@ export default function Facemesh({landmarks}) {
 
   const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks);
 
+  // TODO: make auto calibration ***
+  // landmark pivots (1-based): 
+  //    1: {"x":0.48297885060310364,"y":0.693518340587616,"z":-0.00966000184416771}
+  //  105: {"x":0.43075257539749146,"y":0.5586864352226257,"z":-0.016254324465990067}
+  //  334: {"x":0.5278557538986206,"y":0.5575304627418518,"z":-0.016914816573262215}
+
+  // Transform 1
+  const trans1 = [-landmarks[0].x, -landmarks[0].y, -landmarks[0].z];
+
+  // Rotate
+  const rotate = new THREE.Euler();
+
+  // Transform 2
+  const trans2 = [0.48297885060310364, 0.693518340587616, -0.00966000184416771];
+  // *********************************
+
   // setAttribute force upload to GPU on hook
   if (geometry !== undefined)
     geometry.dispose();

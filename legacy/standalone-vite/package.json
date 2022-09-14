@@ -2,6 +2,7 @@
   "name": "virtual-avatar-standalone",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -21,7 +22,9 @@
     "three": "^0.138.2"
   },
   "devDependencies": {
+    "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@vitejs/plugin-react": "^1.0.7",
+    "madge": "^5.0.1",
     "vite": "^2.8.0"
   }
 }

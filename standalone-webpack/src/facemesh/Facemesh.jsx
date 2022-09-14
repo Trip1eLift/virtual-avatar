@@ -1,33 +1,46 @@
 import * as THREE from 'three';
 import mock_data from './landmarks-mock.json';
 import Landmarks_to_triangles from './landmarks2triangle';
+import {useState, useEffect} from 'react';
 //import CustomShaderMaterial from './shader';
 //import { extend } from "@react-three/fiber";
 
 const l2t = new Landmarks_to_triangles();
 let geometry;
 
-export default function Facemesh({landmarks}) {
-  if (landmarks === undefined)
+export default function Facemesh({landmarks, calibrate, setCalibrate, manualTransformation}) {
+  const [transformation, setTransformation] = useState({trans: [0, 0, 0], rotate: new THREE.Quaternion()});
+
+  useEffect(() => {
+    if (calibrate === false)
+      return;
+    console.log("Calibration reset.")
+    const [up, right] = orientationVectors(landmarks[0], landmarks[104], landmarks[333]);
+    //console.log(up, right);
+    const trans = [-landmarks[0].x, -landmarks[0].y+0.02, -landmarks[0].z];
+    const quaternion = new THREE.Quaternion();
+    quaternion.setFromUnitVectors( up, new THREE.Vector3(0, 1, 0) );
+    const quaternion2 = new THREE.Quaternion();
+    quaternion2.setFromUnitVectors( right, new THREE.Vector3(1, 0, 0.0) );
+    quaternion.multiply(quaternion2);
+
+    setTransformation({trans: trans, rotate: quaternion});
+    setCalibrate(false);
+  }, [calibrate]);
+
+  if (landmarks === undefined) {
     landmarks = mock_data;
+    const defaultTrans = {
+      trans: [-mock_data[0].x, -mock_data[0].y+0.04, -mock_data[0].z],
+      rotate: new THREE.Quaternion(0.9980121, -0.0152293, -0.0399953, 0.0462641),
+      //rotate: new THREE.Euler(3.0500366164090065, -0.0813303473740931, 0.026789092118113494, 'XYZ')
+    };
+    if (JSON.stringify(transformation) != JSON.stringify(defaultTrans))
+      setTransformation(defaultTrans);
+  }
+    
 
   const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks);
-
-  // TODO: make auto calibration ***
-  // landmark pivots (1-based): 
-  //    1: {"x":0.48297885060310364,"y":0.693518340587616,"z":-0.00966000184416771}
-  //  105: {"x":0.43075257539749146,"y":0.5586864352226257,"z":-0.016254324465990067}
-  //  334: {"x":0.5278557538986206,"y":0.5575304627418518,"z":-0.016914816573262215}
-
-  // Transform 1
-  const trans1 = [-landmarks[0].x, -landmarks[0].y, -landmarks[0].z];
-
-  // Rotate
-  const rotate = new THREE.Euler();
-
-  // Transform 2
-  const trans2 = [0.48297885060310364, 0.693518340587616, -0.00966000184416771];
-  // *********************************
 
   // setAttribute force upload to GPU on hook
   if (geometry !== undefined)
@@ -38,32 +51,30 @@ export default function Facemesh({landmarks}) {
   geometry.setAttribute("color",  new THREE.BufferAttribute(colors, itemSize, false));
 
   //extend({ CustomShaderMaterial });
-
-
-  // Adjust position and rotation
-  let envPosition = [0.0, 0.0, 0.0];
-  let envRotation = new THREE.Euler(0.0, 0.0, 0.0, 'XYZ');
-  let envXscale = 1.5;
-  if (process.env.REACT_APP_ENV !== undefined) {
-    const ENV = process.env;
-    envXscale = ENV.REACT_APP_X_scale;
-    envPosition = [ENV.REACT_APP_X_translate, ENV.REACT_APP_Y_translate, ENV.REACT_APP_Z_translate];
-    envRotation = new THREE.Euler(ENV.REACT_APP_X_rotation, ENV.REACT_APP_Y_rotation, ENV.REACT_APP_Z_rotation, 'XYZ');
-  }
-  const expand = 1.5;
+  
+  const expand = 20;
   return (
-    <group >
-      <group scale={[-envXscale * expand, expand, expand]} position={envPosition} rotation={envRotation}>
-      	<mesh 
-          position={[-4.60, 6.1, -2]} scale={10} rotation={new THREE.Euler(-0.3, 3.16, 3.12, 'ZYX')}
-          geometry={geometry}
-        >
-					<meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
-        </mesh>
+      <group scale={[-1.5*expand, expand, expand]}>
+        <group position={manualTransformation.trans}>
+          <group rotation={new THREE.Euler().setFromQuaternion( manualTransformation.rotate )} >
+            <group rotation={new THREE.Euler().setFromQuaternion( transformation.rotate )} >
+              <group position={transformation.trans}>
+                <mesh geometry={geometry}>
+                  <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
+                </mesh>
+              </group>
+            </group>
+          </group>
+        </group>
       </group>
-    </group>
-  );
+    );
 }
 
 // <customShaderMaterial />
 // <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
+
+function orientationVectors(p1, p105, p334) {
+  const right = new THREE.Vector3(p334.x-p105.x, p334.y-p105.y, p334.z-p105.z);
+  const up = new THREE.Vector3((p334.x+p105.x)/2 - p1.x, (p334.y+p105.y)/2 - p1.y, (p334.z+p105.z)/2 - p1.z);
+  return [up.normalize(), right.normalize()];
+}

@@ -3,9 +3,6 @@ A web-based virtual face renderer inspired by the Metaverse.
 
 ![demo](./demo.png)
 
-Demo:![image](https://user-images.githubusercontent.com/43707388/156492954-dfb869b6-b473-4e2e-aabd-35ea9e3f5be6.png)
-
-
 ## Static site setup
 ```
 npm install

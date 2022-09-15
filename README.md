@@ -2,15 +2,21 @@
 A web-based virtual face renderer inspired by Vtuber.
 
 ## Static site setup
-Calibration is based on my personal Nexigo webcam.
 ```
 cd standalone-webpack
 npm install
 npm run dev
 ```
 
+## Terraform deployment
+docs: https://www.alexhyett.com/terraform-s3-static-website-hosting
+
 # 2 tier setup using websocket (old)
 This project involves a Python Server running Mediapipe with Webcam to 3D scan the face. Then send the facial landmarks to Client using websocket protocol. The Client is built on react with graphics engine @react-three/fiber that render facial landmark into browser. This project requires Python3 and Node.js to run.
+
+```
+cd legacy
+```
 
 ## Docker Start (camera issue, docker doesn't work.)
 ```console

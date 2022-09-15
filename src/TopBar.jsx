@@ -105,7 +105,7 @@ function MeshControlPanel({MT, MTC}) {
 	useEffect(() => {
 		const x = -(x_pos - 50) / 200;
 		const y = (y_pos - 50) / 200;
-		const z = (z_pos - 50) / 200;
+		const z = (z_pos - 50) / 100;
 		const yaw_q = new THREE.Quaternion();
 		yaw_q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -(yaw-50)/100*Math.PI*2);
 		const pitch_q = new THREE.Quaternion();

@@ -18,6 +18,25 @@ resource "aws_cloudfront_distribution" "root_s3_distribution" {
 
   aliases = ["${var.bucket_name}"]
 
+  # default_cache_behavior {
+  #   allowed_methods  = ["GET", "HEAD", "OPTIONS", "POST"]
+  #   cached_methods   = ["GET", "HEAD", "OPTIONS", "POST"]
+  #   target_origin_id = "S3-${var.bucket_name}"
+
+  #   forwarded_values {
+  #     query_string = false
+
+  #     cookies {
+  #       forward = "none"
+  #     }
+  #   }
+
+  #   viewer_protocol_policy = "allow-all"
+  #   min_ttl                = 0
+  #   default_ttl            = 3600
+  #   max_ttl                = 86400
+  # }
+
   custom_error_response {
     error_caching_min_ttl = 0
     error_code = 404
@@ -59,3 +78,5 @@ resource "aws_cloudfront_distribution" "root_s3_distribution" {
 
   tags = var.common_tags
 }
+
+# cloudfront cache policy docs: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_cache_policy

@@ -2,7 +2,7 @@ resource "aws_route53_record" "root-a" {
   zone_id = var.hosted_zone_id
   name = var.bucket_name
   type = "A"
-
+  #ttl  = 300
   alias {
     name = aws_cloudfront_distribution.root_s3_distribution.domain_name
     zone_id = aws_cloudfront_distribution.root_s3_distribution.hosted_zone_id

@@ -6,7 +6,7 @@ A web-based virtual face renderer inspired by the Metaverse.
 ## Static site setup
 ```
 npm install
-npm run dev
+npm start
 ```
 Website is published on aws: https://virtualavatar.trip1elift.com/
 

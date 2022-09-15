@@ -62,7 +62,7 @@ npm install
 
 To run
 ```console
-yarn start
+npm start
 ```
 
 # Getting Started with Create React App

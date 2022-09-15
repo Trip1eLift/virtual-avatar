@@ -154,7 +154,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # terraform
-.terraform*
 .terraform
-.terraform/
+.terraform*
 local-dev

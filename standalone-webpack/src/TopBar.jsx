@@ -17,13 +17,14 @@ import Draggable from 'react-draggable';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
 
-export default function TopBar({setCalibrate, setManualTransformation, MTC}) {
+export default function TopBar({Cal, MT, MTC, Settings}) {
+	const setCalibrate = Cal.setter;
 	const [meshControlDialog, setMeshControlDialog] = useState(false);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" style={{backgroundColor:"grey"}}>
         <Toolbar>
-				<MeshControlDraggableDialog open={meshControlDialog} setOpen={setMeshControlDialog} setCalibrate={setCalibrate} setManualTransformation={setManualTransformation} MTC={MTC} />
+				<MeshControlDraggableDialog open={meshControlDialog} setOpen={setMeshControlDialog} Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} />
           <IconButton
             size="large"
             edge="start"
@@ -45,7 +46,8 @@ export default function TopBar({setCalibrate, setManualTransformation, MTC}) {
   );
 }
 
-function MeshControlDraggableDialog({open, setOpen, setCalibrate, setManualTransformation, MTC}) {
+function MeshControlDraggableDialog({open, setOpen, Cal, MT, MTC, Settings}) {
+	const setCalibrate = Cal.setter;
   return (
     <Dialog
 			open={open}
@@ -57,11 +59,14 @@ function MeshControlDraggableDialog({open, setOpen, setCalibrate, setManualTrans
 				Mesh Control
 			</DialogTitle>
 			<DialogContent>
-				<MeshControlPanel setManualTransformation={setManualTransformation} MTC={MTC}/>
+				<div style={{width: "22rem"}}>Please position your face center and straight while hitting the calibrate button.</div>
+				<MeshControlPanel MT={MT} MTC={MTC}/>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={()=>MTC.setter({x_pos:50, y_pos:50, yaw:50, pitch:50})}>Reset</Button>
+				<Button onClick={()=>MTC.setter({x_pos:50, y_pos:50, z_pos:50, yaw:50, pitch:50, roll:50})}>Reset</Button>
 				<Button onClick={()=>setCalibrate(true)}>Calibrate</Button>
+				<Button onClick={()=>Settings.save(false)}>Save</Button>
+				<Button onClick={()=>Settings.load(false)}>Load</Button>
 				<Button autoFocus onClick={()=>setOpen(false)}>Close</Button>
 			</DialogActions>	
 
@@ -80,29 +85,35 @@ function DraggablePaper(props) {
   );
 }
 
-function MeshControlPanel({setManualTransformation, MTC}) {
+function MeshControlPanel({MT, MTC}) {
 	// Let root level store the slider value so the value stays
 	const x_pos = MTC.getter.x_pos;
 	const y_pos = MTC.getter.y_pos;
+	const z_pos = MTC.getter.z_pos;
 	const yaw   = MTC.getter.yaw;
 	const pitch = MTC.getter.pitch;
-	const setX_pos = (val) => MTC.setter({x_pos: val,   y_pos: y_pos, yaw: yaw, pitch: pitch});
-	const setY_pos = (val) => MTC.setter({x_pos: x_pos, y_pos: val,   yaw: yaw, pitch: pitch});
-	const setYaw   = (val) => MTC.setter({x_pos: x_pos, y_pos: y_pos, yaw: val, pitch: pitch});
-	const setPitch = (val) => MTC.setter({x_pos: x_pos, y_pos: y_pos, yaw: yaw, pitch: val  });
+	const roll  = MTC.getter.roll;
+	const setX_pos = (val) => MTC.setter({x_pos: val,   y_pos: y_pos, z_pos: z_pos, yaw: yaw, pitch: pitch, roll: roll});
+	const setY_pos = (val) => MTC.setter({x_pos: x_pos, y_pos: val,   z_pos: z_pos, yaw: yaw, pitch: pitch, roll: roll});
+	const setZ_pos = (val) => MTC.setter({x_pos: x_pos, y_pos: y_pos, z_pos: val,   yaw: yaw, pitch: pitch, roll: roll});
+	const setYaw   = (val) => MTC.setter({x_pos: x_pos, y_pos: y_pos, z_pos: z_pos, yaw: val, pitch: pitch, roll: roll});
+	const setPitch = (val) => MTC.setter({x_pos: x_pos, y_pos: y_pos, z_pos: z_pos, yaw: yaw, pitch: val  , roll: roll});
+	const setRoll  = (val) => MTC.setter({x_pos: x_pos, y_pos: y_pos, z_pos: z_pos, yaw: yaw, pitch: pitch, roll: val });
+	const setManualTransformation = MT.setter;
 
 	useEffect(() => {
 		const x = -(x_pos - 50) / 200;
 		const y = (y_pos - 50) / 200;
+		const z = (z_pos - 50) / 200;
 		const yaw_q = new THREE.Quaternion();
 		yaw_q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -(yaw-50)/100*Math.PI*2);
 		const pitch_q = new THREE.Quaternion();
 		pitch_q.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (pitch-50)/100*Math.PI*2);
-		setManualTransformation({trans: [x, y, 0], rotate: new THREE.Quaternion().multiplyQuaternions(yaw_q, pitch_q)});
-	}, [x_pos, y_pos, yaw, pitch]);
+		setManualTransformation({trans: [x, y, z], rotate: new THREE.Quaternion().multiplyQuaternions(yaw_q, pitch_q)});
+	}, [x_pos, y_pos, z_pos, yaw, pitch]);
 	
 	return (
-		<div style={{width:"20rem", marginTop:"1rem"}}>
+		<div style={{width:"22rem", marginTop:"1rem"}}>
 			<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
 				<div style={{width:"7rem"}}>X position</div>
 				<Slider value={x_pos} onChange={(e, val)=>setX_pos(val)} />
@@ -112,12 +123,20 @@ function MeshControlPanel({setManualTransformation, MTC}) {
 				<Slider value={y_pos} onChange={(e, val)=>setY_pos(val)} />
       </Stack>
 			<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+				<div style={{width:"7rem"}}>Z position</div>
+				<Slider value={z_pos} onChange={(e, val)=>setZ_pos(val)} />
+      </Stack>
+			<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
 				<div style={{width:"7rem"}}>Yaw</div>
 				<Slider value={yaw} onChange={(e, val)=>setYaw(val)} />
       </Stack>
 			<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
 				<div style={{width:"7rem"}}>Pitch</div>
 				<Slider value={pitch} onChange={(e, val)=>setPitch(val)} />
+      </Stack>
+			<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+				<div style={{width:"7rem"}}>Roll</div>
+				<Slider disabled value={roll} onChange={(e, val)=>setRoll(val)} />
       </Stack>
 		</div>
 	)

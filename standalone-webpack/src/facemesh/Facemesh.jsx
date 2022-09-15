@@ -8,14 +8,18 @@ import {useState, useEffect} from 'react';
 const l2t = new Landmarks_to_triangles();
 let geometry;
 
-export default function Facemesh({landmarks, calibrate, setCalibrate, manualTransformation}) {
-  const [transformation, setTransformation] = useState({trans: [0, 0, 0], rotate: new THREE.Quaternion()});
+export default function Facemesh({landmarks, CT, Cal, MT}) {
+  const calibrate = Cal.getter;
+  const setCalibrate = Cal.setter;
+  const manualTransformation = MT.getter;
+  const transformation = CT.getter;
+  const setTransformation = CT.setter;
 
   useEffect(() => {
     if (calibrate === false)
       return;
     console.log("Calibration reset.")
-    const [up, right] = orientationVectors(landmarks[0], landmarks[104], landmarks[333]);
+    const [up, right] = orientationVectors(landmarks[0], landmarks[158], landmarks[385]);
     //console.log(up, right);
     const trans = [-landmarks[0].x, -landmarks[0].y+0.02, -landmarks[0].z];
     const quaternion = new THREE.Quaternion();
@@ -73,8 +77,8 @@ export default function Facemesh({landmarks, calibrate, setCalibrate, manualTran
 // <customShaderMaterial />
 // <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
 
-function orientationVectors(p1, p105, p334) {
-  const right = new THREE.Vector3(p334.x-p105.x, p334.y-p105.y, p334.z-p105.z);
-  const up = new THREE.Vector3((p334.x+p105.x)/2 - p1.x, (p334.y+p105.y)/2 - p1.y, (p334.z+p105.z)/2 - p1.z);
+function orientationVectors(nose, leye, reye) {
+  const right = new THREE.Vector3(reye.x-leye.x, reye.y-leye.y, reye.z-leye.z);
+  const up = new THREE.Vector3((reye.x+leye.x)/2 - nose.x, (reye.y+leye.y)/2 - nose.y, (reye.z+leye.z)/2 - nose.z);
   return [up.normalize(), right.normalize()];
 }

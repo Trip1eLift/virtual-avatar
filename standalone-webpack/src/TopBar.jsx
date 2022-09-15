@@ -17,9 +17,10 @@ import Draggable from 'react-draggable';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
 
-export default function TopBar({Cal, MT, MTC, Settings}) {
-	const setCalibrate = Cal.setter;
+export default function TopBar({Cal, MT, MTC, Settings, Skin}) {
 	const [meshControlDialog, setMeshControlDialog] = useState(false);
+	const skin = Skin.getter;
+	const setSkin = Skin.setter;
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" style={{backgroundColor:"grey"}}>
@@ -38,7 +39,7 @@ export default function TopBar({Cal, MT, MTC, Settings}) {
           <Typography variant="h6" component="div" align="center" sx={{ flexGrow: 1 }}>
             <div style={{cursor:"default"}}>Virtual Avatar</div>
           </Typography>
-          <Button color="inherit" onClick={(e)=>setCalibrate(true)}>Calibrate</Button>
+					<Button color="inherit" onClick={(e)=>setSkin(skin+1)}>Skin</Button>
           <Button color="inherit">About</Button>
         </Toolbar>
       </AppBar>

@@ -7,7 +7,7 @@ class Landmarks_to_triangles {
         this.vmp = vertices_mapping;
     }
 
-    map2DoublePoints(landmarks) {
+    map2DoublePoints(landmarks, skin_id) {
         let points = new Float32Array(this.vmp.length * 3 * 3);
         const scale = 1;
         for (let i = 0;  i < this.vmp.length; i++) {
@@ -27,7 +27,7 @@ class Landmarks_to_triangles {
         const dbPoint = this.doubleSidedPoints(points);
         const count = dbPoint.length / 3;
         const normals = undefined; //this.points2flatnormal(dbPoint);
-        const colors = this.generateColor(count);
+        const colors = this.generateColor(skin_id, count);
         //console.log("triangle counts: ", count / 3); // 1704
         return [dbPoint, normals, colors, 3, count];
     }
@@ -53,13 +53,15 @@ class Landmarks_to_triangles {
         return normals;
     }
 
-    generateColor(count, mixed = false) {
+    generateColor(skin_id, count, mixed = false) {
         let colors = new Float32Array(count * 3);
 
-        const skin_1 = ["hotpink", "skyblue", "yellow", "red", "yellowgreen", "pink", "orange"];
-        const skin_2 = ["orange", "yellowgreen", "yellow"];
-        const skin_3 = ["hotpink", "skyblue", "pink"];
-        const color_list = skin_2;
+        const skin = [
+            ["orange", "yellowgreen", "yellow"],
+            ["hotpink", "skyblue", "pink"],
+            ["hotpink", "skyblue", "yellow", "red", "yellowgreen", "pink", "orange"],
+        ];
+        const color_list = skin[skin_id % skin.length];
 
         if (mixed === false) {
             const randIntList = this.getRandomIntArray(count / 3); // aka 1704

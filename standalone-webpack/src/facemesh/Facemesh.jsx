@@ -8,7 +8,7 @@ import {useState, useEffect} from 'react';
 const l2t = new Landmarks_to_triangles();
 let geometry;
 
-export default function Facemesh({landmarks, CT, Cal, MT}) {
+export default function Facemesh({landmarks, CT, Cal, MT, Skin}) {
   const calibrate = Cal.getter;
   const setCalibrate = Cal.setter;
   const manualTransformation = MT.getter;
@@ -44,7 +44,7 @@ export default function Facemesh({landmarks, CT, Cal, MT}) {
   }
     
 
-  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks);
+  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks, Skin.getter);
 
   // setAttribute force upload to GPU on hook
   if (geometry !== undefined)

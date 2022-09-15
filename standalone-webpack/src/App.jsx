@@ -15,14 +15,16 @@ export default function App() {
   const [calibrateTransformation, setCalibrateTransformation] = useState({trans: [0, 0, 0], rotate: new THREE.Quaternion()});
   const [manualTransformation, setManualTransformation] = useState({trans: [0, 0, 0], rotate: new THREE.Quaternion()});
   const [manualTransformationControl, setManualTransformationControl] = useState({x_pos: 50, y_pos: 50, z_pos: 50, yaw: 50, pitch:50, roll: 50});
+  const [skin, setSkin] = useState(0);
 
   const Cal = {getter: calibrate, setter: setCalibrate};
   const CT = {getter: calibrateTransformation, setter: setCalibrateTransformation};
   const MT = {getter: manualTransformation, setter: setManualTransformation};
   const MTC = {getter: manualTransformationControl, setter: setManualTransformationControl};
+  const Skin = {getter: skin, setter: setSkin};
 
   function saveSettings() {
-    const settings = {_Cal: Cal.getter, _CT: CT.getter, _MT: MT.getter, _MTC: MTC.getter}
+    const settings = {_Cal: Cal.getter, _CT: CT.getter, _MT: MT.getter, _MTC: MTC.getter, _Skin: Skin.getter}
     localStorage.setItem('calibrationSettings', JSON.stringify(settings));
   }
 
@@ -34,6 +36,7 @@ export default function App() {
     CT.setter( settings._CT );
     MT.setter( settings._MT );
     MTC.setter(settings._MTC);
+    Skin.setter(settings._Skin || 0);
     return true;
   }
 
@@ -56,7 +59,7 @@ export default function App() {
 
   return (
     <>
-      <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} />
+      <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} />
 
       <MediapipeCameraWrapper onResults={onResults}/>
       <Canvas>
@@ -66,7 +69,7 @@ export default function App() {
         <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
 
         <Suspense fallback={null}>
-          <Facemesh landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} />
+          <Facemesh landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} />
         </Suspense>
       </Canvas>
   </>

@@ -1,4 +1,4 @@
-import { FaceMesh } from '@mediapipe/face_mesh';
+import * as FM from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 import Webcam from 'react-webcam';
 import { useRef, useEffect } from 'react';
@@ -12,7 +12,7 @@ export default function MediapipeCameraWrapper({onResults}) {
 
   useEffect(() => {
     // set ML model
-    const faceMesh = new FaceMesh({
+    const faceMesh = new FM.FaceMesh({
       locateFile:(file)=>{
         return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`; // load model file
         // https://google.github.io/mediapipe/solutions/face_mesh#:~:text=return%20%60https%3A//cdn.jsdelivr.net/npm/%40mediapipe/face_mesh/%24%7Bfile%7D%60%3B
@@ -27,7 +27,7 @@ export default function MediapipeCameraWrapper({onResults}) {
     faceMesh.onResults(onResults); // callback
 
     if (typeof(webcamRef.current) !== "undefined" && webcamRef.current !== null) {
-      console.log(webcamRef.current.video);
+      //console.log(webcamRef.current.video);
       camera = new cam.Camera(webcamRef.current.video, 
         {onFrame:async()=>{
           await faceMesh.send({image:webcamRef.current.video}) // run ML model

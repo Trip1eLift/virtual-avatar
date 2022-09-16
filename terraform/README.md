@@ -19,7 +19,5 @@ cd app-root
 
 npm install && npm run build
 
-cd ./build
-
-aws s3 sync . s3://virtualavatar.trip1elift.com
+aws s3 sync ./build s3://virtualavatar.trip1elift.com
 ```

@@ -1,6 +1,7 @@
 domain_name = "trip1elift.com"
 bucket_name = "virtualavatar.trip1elift.com"
 hosted_zone_id = "Z02316541LCC6J0N3IECG"
+app_name = "virtualavatar"
 
 common_tags = {
   Project = "virtualavatar"

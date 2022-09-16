@@ -14,7 +14,7 @@ resource "aws_s3_bucket_website_configuration" "root_bucket" {
 	}
 
 	error_document {
-		key = "error.html"
+		key = "404.html"
 	}
 }
 

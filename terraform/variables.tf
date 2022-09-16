@@ -15,3 +15,7 @@ variable "common_tags" {
 variable "hosted_zone_id" {
   description = "Id of the existing hosted zone."
 }
+
+variable "app_name" {
+  description = "Unused variable."
+}

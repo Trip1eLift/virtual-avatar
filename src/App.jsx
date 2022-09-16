@@ -32,10 +32,10 @@ export default function App() {
     const settings = JSON.parse(localStorage.getItem('calibrationSettings'));
     if (settings == null)
       return false;
-    Cal.setter(settings._Cal);
-    CT.setter( settings._CT );
-    MT.setter( settings._MT );
-    MTC.setter(settings._MTC);
+    Cal.setter(settings._Cal || false);
+    CT.setter( settings._CT || {trans: [0, 0, 0], rotate: new THREE.Quaternion()});
+    MT.setter( settings._MT || {trans: [0, 0, 0], rotate: new THREE.Quaternion()});
+    MTC.setter(settings._MTC || {x_pos: 50, y_pos: 50, z_pos: 50, yaw: 50, pitch:50, roll: 50});
     Skin.setter(settings._Skin || 0);
     return true;
   }

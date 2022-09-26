@@ -3,6 +3,11 @@ A web-based virtual face renderer inspired by the Metaverse.
 
 ![demo](./demo.png)
 
+## Outlook
+The virtual avatar currently only contain a static frontend. The next step is to deploy a streaming backend to support video chat using virtual facemesh. The intent architecture design is shown in the diagram below.
+
+![Architecture Diagram](./Architecture-diagram.jpg)
+
 ## Static site setup
 ```
 npm install

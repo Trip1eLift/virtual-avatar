@@ -3,6 +3,11 @@ A web-based virtual face renderer inspired by the Metaverse.
 
 ![demo](./demo.png)
 
+Website is published on aws: https://virtualavatar.trip1elift.com/
+
+Resources: Route53, Certs, CloudFront, S3
+Core Technologies: ReactJS, Google Mediapipe, ThreeJS, React-Three-Fiber, Terraform, AWS
+
 ## Outlook
 The virtual avatar currently only contain a static frontend. The next step is to deploy a streaming backend to support video chat using virtual facemesh. The intent architecture design is shown in the diagram below.
 
@@ -13,9 +18,6 @@ The virtual avatar currently only contain a static frontend. The next step is to
 npm install
 npm start
 ```
-Website is published on aws: https://virtualavatar.trip1elift.com/
-
-Utilizing: Route53, Certs, CloudFront, S3
 
 ## Terraform deployment
 Follow [Terraform README](./terraform/README.md) for deployment sequence.

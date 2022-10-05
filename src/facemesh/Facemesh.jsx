@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import mock_data from './landmarks-mock.json';
 import Landmarks_to_triangles from './landmarks2triangle';
-import {useState, useEffect} from 'react';
+import {useEffect} from 'react';
 //import CustomShaderMaterial from './shader';
 //import { extend } from "@react-three/fiber";
 
@@ -39,7 +39,7 @@ export default function Facemesh({landmarks, CT, Cal, MT, Skin}) {
       rotate: new THREE.Quaternion(0.9980121, -0.0152293, -0.0399953, 0.0462641),
       //rotate: new THREE.Euler(3.0500366164090065, -0.0813303473740931, 0.026789092118113494, 'XYZ')
     };
-    if (JSON.stringify(transformation) != JSON.stringify(defaultTrans))
+    if (JSON.stringify(transformation) !== JSON.stringify(defaultTrans))
       setTransformation(defaultTrans);
   }
     

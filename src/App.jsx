@@ -1,7 +1,7 @@
 import './Scene.css';
 import MediapipeCameraWrapper from "./MediapipeCameraWrapper";
 import Facemesh from './facemesh/Facemesh';
-import { useState, Suspense, useEffect } from 'react';
+import { useState, Suspense } from 'react';
 import { Canvas } from "@react-three/fiber";
 import TopBar from './TopBar';
 import * as THREE from 'three';

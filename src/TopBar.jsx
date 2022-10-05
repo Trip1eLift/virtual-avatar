@@ -5,9 +5,6 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useEffect, useState } from 'react';
-import * as THREE from 'three';
-
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -16,9 +13,13 @@ import Paper from '@mui/material/Paper';
 import Draggable from 'react-draggable';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
+import { useEffect, useState } from 'react';
+import * as THREE from 'three';
+import About from './About';
 
 export default function TopBar({Cal, MT, MTC, Settings, Skin}) {
 	const [meshControlDialog, setMeshControlDialog] = useState(false);
+	const [about, setAbout] = useState(false);
 	const skin = Skin.getter;
 	const setSkin = Skin.setter;
   return (
@@ -40,7 +41,8 @@ export default function TopBar({Cal, MT, MTC, Settings, Skin}) {
             <div style={{cursor:"default"}}>Virtual Avatar</div>
           </Typography>
 					<Button color="inherit" onClick={(e)=>setSkin(skin+1)}>Skin</Button>
-          <Button color="inherit">About</Button>
+          <Button color="inherit" onClick={(e)=>setAbout(true)}>About</Button>
+					<About open={about} setOpen={setAbout} />
         </Toolbar>
       </AppBar>
     </Box>

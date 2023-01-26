@@ -1,68 +1,76 @@
 const url = "ws://localhost:5000";
 
-function ownerConn(url, setRoomId) {
-  const socket = new WebSocket(url, ["owner"]);
+class WebSocketPeering {
+  constructor() {
+    this.url = url;
+  }
 
-  socket.onopen = async function(e) {
-    console.log("[open] Connection established");
+  ownerConn(url, setRoomId) {
+    const socket = new WebSocket(url, ["owner"]);
+  
+    socket.onopen = async function(e) {
+      console.log("[open] Connection established");
+      
+      const room_id = await Demand(socket, "Room-Id");
+      console.log(`Room-Id: ${room_id}`);
+      setRoomId(room_id);
+    };
     
-    const room_id = await Demand(socket, "Room-Id");
-    console.log(`Room-Id: ${room_id}`);
-    setRoomId(room_id);
-  };
-  
-  socket.onmessage = function(event) {
-    console.log(`[owner] recieved: ${event.data}`);
-  };
-  
-  socket.onclose = function(event) {
-    if (event.wasClean) {
-      console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-    } else {
-      console.error('[close] Connection died');
-    }
-  };
-
-  socket.onerror = function(error) {
-    console.error(error);
-    console.error(`[error]`);
-  };
-
-  return socket;
-}
-
-function guestConn(url, room_id) {
-  const socket = new WebSocket(url, ["guest"]);
-
-  socket.onopen = async function(e) {
-    console.log("[open] Connection established");
+    socket.onmessage = function(event) {
+      console.log(`[owner] recieved: ${event.data}`);
+    };
     
-    await Supply(socket, "Room-Id", room_id);
-  };
-
-  socket.onmessage = function(event) {
-    console.log(`[owner] recieved: ${event.data}`);
-  };
+    socket.onclose = function(event) {
+      if (event.wasClean) {
+        console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+      } else {
+        console.error('[close] Connection died');
+      }
+    };
   
-  socket.onclose = function(event) {
-    if (event.wasClean) {
-      console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-    } else {
-      console.error('[close] Connection died');
+    socket.onerror = function(error) {
+      console.error(error);
+      console.error(`[error]`);
+    };
+    
+    this.socket = socket;
+    return socket;
+  }
+
+  guestConn(url, room_id) {
+    const socket = new WebSocket(url, ["guest"]);
+  
+    socket.onopen = async function(e) {
+      console.log("[open] Connection established");
+      
+      await Supply(socket, "Room-Id", room_id);
+    };
+  
+    socket.onmessage = function(event) {
+      console.log(`[owner] recieved: ${event.data}`);
+    };
+    
+    socket.onclose = function(event) {
+      if (event.wasClean) {
+        console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+      } else {
+        console.error('[close] Connection died');
+      }
+    };
+  
+    socket.onerror = function(error) {
+      console.error(error);
+      console.error(`[error]`);
+    };
+  
+    this.socket = socket;
+    return socket;
+  }
+
+  sendUuid() {
+    if (this.socket !== undefined) {
+      this.socket.send(`Push ${uuidv4()}`);
     }
-  };
-
-  socket.onerror = function(error) {
-    console.error(error);
-    console.error(`[error]`);
-  };
-
-  return socket;
-}
-
-function sendUuid(socket) {
-  if (socket !== undefined) {
-    socket.send(`Push ${uuidv4()}`);
   }
 }
 
@@ -95,3 +103,5 @@ function Supply(conn, ask, ans) {
     }
   });
 }
+
+export default WebSocketPeering;

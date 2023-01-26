@@ -5,8 +5,8 @@ class WebSocketPeering {
     this.url = url;
   }
 
-  ownerConn(url, setRoomId) {
-    const socket = new WebSocket(url, ["owner"]);
+  ownerConn(setRoomId) {
+    const socket = new WebSocket(this.url, ["owner"]);
   
     socket.onopen = async function(e) {
       console.log("[open] Connection established");
@@ -37,8 +37,8 @@ class WebSocketPeering {
     return socket;
   }
 
-  guestConn(url, room_id) {
-    const socket = new WebSocket(url, ["guest"]);
+  guestConn(room_id) {
+    const socket = new WebSocket(this.url, ["guest"]);
   
     socket.onopen = async function(e) {
       console.log("[open] Connection established");

@@ -3,8 +3,6 @@ import * as cam from '@mediapipe/camera_utils';
 import Webcam from 'react-webcam';
 import { useRef, useEffect } from 'react';
 
-// Tutorial: https://www.youtube.com/watch?v=oNB5hVabqL4
-
 export default function MediapipeCameraWrapper({onResults}) {
 
   const webcamRef = useRef(null);

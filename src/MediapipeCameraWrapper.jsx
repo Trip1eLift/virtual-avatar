@@ -19,10 +19,9 @@ const audioConstraints = {
   echoCancellation: true,
 };
 
-export default function MediapipeCameraWrapper({onResults, Stream}) {
+export default function MediapipeCameraWrapper({onResults, WSP}) {
 
   const webcamRef = useRef(null);
-  const wsp = Stream.getter.wsp;
   let camera = null;
 
   useEffect(() => {
@@ -62,7 +61,11 @@ export default function MediapipeCameraWrapper({onResults, Stream}) {
       audio={true}
       muted={true}
       ref={webcamRef}
-      onUserMedia={(stream)=>wsp.onUserMedia(stream)}
+      onUserMedia={(stream)=>{
+        if (WSP !== undefined) {
+          WSP.onUserMedia(stream)
+        }
+      }}
     />
   );
 }

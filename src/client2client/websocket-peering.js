@@ -47,6 +47,7 @@ const MESSAGE_TYPE = {
 
 class WebSocketPeering {
   constructor(streamVideo = false) {
+    console.log("Constructing wsp...");
     const peer = new RTCPeerConnection(ICE_config, Peer_options);
     const remoteStream = new MediaStream();
 
@@ -83,6 +84,10 @@ class WebSocketPeering {
     this.dc = datachannel;
     this.remoteStream = remoteStream;
     this.streamVideo = streamVideo;
+  }
+
+  test() {
+    console.log("test function here")
   }
 
   ownerConn(url, setRoomId) {

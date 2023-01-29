@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import About from './About';
 
-export default function TopBar({Cal, MT, MTC, Settings, Skin, Stream}) {
+export default function TopBar({Cal, MT, MTC, Settings, Skin, Stream, WSP}) {
 	const [meshControlDialog, setMeshControlDialog] = useState(false);
 	const [about, setAbout] = useState(false);
 	const [streamControlDialog, setStreamControlDialog] = useState(false);
@@ -33,7 +33,7 @@ export default function TopBar({Cal, MT, MTC, Settings, Skin, Stream}) {
           <IconButton onClick={(e)=>setMeshControlDialog(true)} size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
-					<StreamControlDialog open={streamControlDialog} setOpen={setStreamControlDialog} Stream={Stream} />
+					<StreamControlDialog open={streamControlDialog} setOpen={setStreamControlDialog} Stream={Stream} WSP={WSP}/>
 					<Button color="inherit" onClick={(e)=>setStreamControlDialog(true)}>Stream</Button>
           <Typography variant="h6" component="div" align="center" sx={{ flexGrow: 1 }}>
             <div style={{cursor:"default"}}>Virtual Avatar</div>
@@ -147,7 +147,7 @@ function MeshControlPanel({MT, MTC}) {
 	)
 }
 
-function StreamControlDialog({open, setOpen, Stream}) {
+function StreamControlDialog({open, setOpen, Stream, WSP}) {
 	const [roomId, setRoomId] = useState();
 	const [disableRoomField, setDisableRoomField] = useState(false);
 	const stream = Stream.getter;
@@ -155,20 +155,20 @@ function StreamControlDialog({open, setOpen, Stream}) {
 
 	function createRoom(event) {
 		setDisableRoomField(true);
-		stream.wsp.ownerConn(stream.url, setRoomId);
-		setStream({start: true, url: stream.url, wsp: stream.wsp});
+		WSP.ownerConn(stream.url, setRoomId);
+		setStream({start: true, url: stream.url});
 	}
 
 	function joinRoom(event) {
 		// Click joinRoom to release roomField if it was locked.
 		if (disableRoomField) {
 			setDisableRoomField(false);
-			setStream({start: false, url: stream.url, wsp: stream.wsp});
+			setStream({start: false, url: stream.url});
 			return;
 		}
 
-		stream.wsp.guestConn(stream.url, roomId);
-		setStream({start: true, url: stream.url, wsp: stream.wsp});
+		WSP.guestConn(stream.url, roomId);
+		setStream({start: true, url: stream.url});
 	}
 
 	function copyRoomUrl(event) {

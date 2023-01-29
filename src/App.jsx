@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import WebSocketPeering from './client2client/websocket-peering';
 
 const backendUrl = "ws://localhost:5000";
+//const wsp = new WebSocketPeering();
 
 /**
  * TODO:
@@ -29,7 +30,8 @@ export default function App() {
   const [manualTransformation, setManualTransformation] = useState({trans: [0, 0, 0], rotate: new THREE.Quaternion()});
   const [manualTransformationControl, setManualTransformationControl] = useState({x_pos: 50, y_pos: 50, z_pos: 50, yaw: 50, pitch:50, roll: 50});
   const [skin, setSkin] = useState(0);
-  const [stream, setStream] = useState({start: false, url: backendUrl, wsp: new WebSocketPeering});
+  const [stream, setStream] = useState({start: false, url: backendUrl});
+  const [wsp, setWsp] = useState();
 
   const Cal = {getter: calibrate, setter: setCalibrate};
   const CT = {getter: calibrateTransformation, setter: setCalibrateTransformation};
@@ -41,12 +43,14 @@ export default function App() {
   const remoteMedia = useRef(null);
 
   useEffect(() => {
+    const WSP = new WebSocketPeering();
     if (typeof(remoteMedia.current) !== "undefined" && remoteMedia.current !== null) {
-      remoteMedia.current.srcObject = stream.wsp.getRemoteStream();
+      remoteMedia.current.srcObject = WSP.getRemoteStream();
       remoteMedia.current.onloadedmetadata = function(e) {
         remoteMedia.current.play();
       };
     }
+    setWsp(WSP);
   }, []);
 
   function saveSettings() {
@@ -84,17 +88,16 @@ export default function App() {
   }
 
   var canvasStyle = { position: "relative", width: "100%", height: "100%" };
-  if (stream.start === true) {
+  if (stream) {
     canvasStyle = { position: "relative", width: "49%", height: "50%", borderStyle: "solid", borderWidth: "3px", borderColor: "white", borderRadius: "5px" };
   }
 
   return (
     <>
-      <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} Stream={Stream} />
-
-      {true && <MediapipeCameraWrapper onResults={onResults} Stream={Stream} />}
+      <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} Stream={Stream} WSP={wsp} />
+      {true && <MediapipeCameraWrapper onResults={onResults} WSP={wsp} />}
       <div style={canvasStyle}>
-        <Canvas>
+        {true && <Canvas>
           {/*<OrbitControls />*/}
           <ambientLight intensity={0.1} />
           <spotLight position={[10, 15, 20]} angle={0.5} intensity={0.8}/>
@@ -103,7 +106,8 @@ export default function App() {
           <Suspense fallback={null}>
             <Facemesh landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} />
           </Suspense>
-        </Canvas>
+        </Canvas>}
+        
         <audio ref={remoteMedia} autoPlay />
       </div>
   </>

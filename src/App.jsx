@@ -103,9 +103,9 @@ export default function App() {
   return (
     <>
       <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} Stream={Stream} WSP={wsp} />
-      {true && <MediapipeCameraWrapper setLandmarks={setLandmarks} setCalibrateTransformation={setCalibrateTransformation} WSP={wsp} />}
+      <MediapipeCameraWrapper setLandmarks={setLandmarks} setCalibrateTransformation={setCalibrateTransformation} WSP={wsp} />
       <div style={canvasStyle(stream.start)}>
-        {true && <Canvas>
+        <Canvas>
           {/*<OrbitControls />*/}
           <ambientLight intensity={0.1} />
           <spotLight position={[10, 15, 20]} angle={0.5} intensity={0.8}/>
@@ -114,7 +114,7 @@ export default function App() {
           <Suspense fallback={null}>
             <FacemeshControl landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} WSP={wsp} />
           </Suspense>
-        </Canvas>}
+        </Canvas>
       </div>
       <div style={canvasStyle(stream.start)}>
         {remoteFacemesh !== undefined && <Canvas>

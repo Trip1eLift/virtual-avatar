@@ -48,7 +48,7 @@ const MESSAGE_TYPE = {
 
 class WebSocketPeering {
   constructor(streamVideo = false) {
-    // console.log("Constructing wsp..."); // Debuging for constrcutor spamming
+    console.log("Constructing wsp..."); // Debuging for constrcutor spamming
     const peer = new RTCPeerConnection(ICE_config, Peer_options);
     const remoteStream = new MediaStream();
 

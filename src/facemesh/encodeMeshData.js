@@ -1,5 +1,4 @@
 import vertices_mapping from './facemesh_vertices_mapping.json';
-import { Float16Array } from "@petamoriken/float16";
 import { Quaternion } from 'three';
 
 // TODO: figure out how to use Float16Array later

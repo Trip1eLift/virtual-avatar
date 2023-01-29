@@ -43,15 +43,26 @@ function Facemesh({landmarks, CT, Cal, MT, Skin, WSP}) {
     if (JSON.stringify(transformation) !== JSON.stringify(defaultTrans))
       setTransformation(defaultTrans);
   }
+
+  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks, Skin.getter);
+
+  if (WSP !== undefined) {
+    // TODO: Send transform/skin data every 5 seconds only
+    // Fast encoder doc: https://gist.github.com/enepomnyaschih/72c423f727d395eeaa09697058238727
+    // https://tutorialspots.com/webrtc-error-rtcdatachannel-send-queue-is-full-7200.html
+    const pack = JSON.stringify({dbPoints: dbPoints, manualTransformation: manualTransformation, transformation: transformation, skin: Skin.getter});
+    // https://stackoverflow.com/questions/20706783/put-byte-array-to-json-and-vice-versa
+    const bytes = btoa(pack);
+    console.log(bytes);
+    WSP.sendFacemeshData("hello");
+  }
   
   return (
-    <FacemeshDisplay manualTransformation={manualTransformation} transformation={transformation} landmarks={landmarks} skin={Skin.getter} />
+    <FacemeshDisplay manualTransformation={manualTransformation} transformation={transformation} dbPoints={dbPoints} colors={colors} itemSize={itemSize} />
   );
 }
 
-function FacemeshDisplay({manualTransformation, transformation, landmarks, skin, local=true}) {
-  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks, skin);
-
+function FacemeshDisplay({manualTransformation, transformation, dbPoints, colors, itemSize, local=true}) {
   var geometry = local_geometry;
   if (local === false) {
     geometry = remote_geometry;

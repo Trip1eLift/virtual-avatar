@@ -8,7 +8,7 @@ class Landmarks_to_triangles {
     }
 
     map2DoublePoints(landmarks, skin_id) {
-        let points = new Float32Array(this.vmp.length * 3 * 3);
+        let points = new Float32Array(this.vmp.length * 3 * 3); // TODO: can i do 8 byte float?
         const scale = 1;
         for (let i = 0;  i < this.vmp.length; i++) {
             points[i * 9 + 0] = landmarks[this.vmp[i][0]].x * scale;

@@ -7,6 +7,9 @@ import TopBar from './TopBar';
 import * as THREE from 'three';
 //import { OrbitControls } from '@react-three/drei';
 import WebSocketPeering from './client2client/websocket-peering';
+import Landmarks_to_triangles from './facemesh/landmarks2triangle';
+
+const l2t = new Landmarks_to_triangles();
 
 const backendUrl = "ws://localhost:5000";
 //const wsp = new WebSocketPeering();
@@ -50,10 +53,20 @@ export default function App() {
         remoteMedia.current.play();
       };
     }
-    WSP.handleFacemeshData((data) => {
+    WSP.handleFacemeshData((bytes) => {
       // console.log("recieving data...");
       // console.log(data);
-      setRemoteFacemesh(data);
+      // TODO: recieve data here
+      
+      // var facemesh = {dbPoints: dbPoints};
+      // facemesh.manualTransformation = data.manualTransformation ? data.manualTransformation : remoteFacemesh.manualTransformation;
+      // facemesh.transformation       = data.transformation       ? data.transformation       : remoteFacemesh.transformation;
+      // facemesh.colors               = data.skin != undefined    ? l2t.generateColor(data.skin, dbPoints.length / 3) : remoteFacemesh.colors;
+      
+      console.log(bytes);
+      // var data = JSON.parse(atob(bytes));
+      // data.colors =  l2t.generateColor(data.skin, data.dbPoints.length / 3);
+      //setRemoteFacemesh(data);
     });
 
     setWsp(WSP);
@@ -86,11 +99,6 @@ export default function App() {
     setFirstUdf(false);
   }
 
-  // TODO: Send data to remote here every 5 seconds only
-  // if (wsp !== undefined) {
-  //   wsp.sendFacemeshData({manualTransformation: manualTransformation, transformation: calibrateTransformation, skin: Skin.getter});
-  // }
-
   return (
     <>
       <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} Stream={Stream} WSP={wsp} />
@@ -114,7 +122,7 @@ export default function App() {
           <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
 
           <Suspense fallback={null}>
-            <FacemeshDisplay manualTransformation={remoteFacemesh.manualTransformation} transformation={remoteFacemesh.transformation} landmarks={remoteFacemesh.landmarks} skin={remoteFacemesh.skin} local={false}/>
+            <FacemeshDisplay manualTransformation={remoteFacemesh.manualTransformation} transformation={remoteFacemesh.transformation} dbPoints={remoteFacemesh.dbPoints} colors={remoteFacemesh.colors} itemSize={3} />
           </Suspense>
         </Canvas>}
       </div>

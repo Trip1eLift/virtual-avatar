@@ -7,8 +7,28 @@ class Landmarks_to_triangles {
         this.vmp = vertices_mapping;
     }
 
+    map2meshPoints(landmarks) {
+        let points = new Float32Array(this.vmp.length * 3 * 3);
+
+        for (let i = 0;  i < this.vmp.length; i++) {
+            points[i * 9 + 0] = landmarks[this.vmp[i][0]].x;
+            points[i * 9 + 1] = landmarks[this.vmp[i][0]].y;
+            points[i * 9 + 2] = landmarks[this.vmp[i][0]].z;
+
+            points[i * 9 + 3] = landmarks[this.vmp[i][1]].x;
+            points[i * 9 + 4] = landmarks[this.vmp[i][1]].y;
+            points[i * 9 + 5] = landmarks[this.vmp[i][1]].z;
+
+            points[i * 9 + 6] = landmarks[this.vmp[i][2]].x;
+            points[i * 9 + 7] = landmarks[this.vmp[i][2]].y;
+            points[i * 9 + 8] = landmarks[this.vmp[i][2]].z;
+        }
+        
+        return points;
+    }
+
     map2DoublePoints(landmarks, skin_id) {
-        let points = new Float32Array(this.vmp.length * 3 * 3); // TODO: can i do 8 byte float?
+        let points = new Float32Array(this.vmp.length * 3 * 3);
         const scale = 1;
         for (let i = 0;  i < this.vmp.length; i++) {
             points[i * 9 + 0] = landmarks[this.vmp[i][0]].x * scale;

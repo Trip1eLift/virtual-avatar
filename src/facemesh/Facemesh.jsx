@@ -9,7 +9,7 @@ const l2t = new Landmarks_to_triangles();
 let local_geometry;
 let remote_geometry;
 
-function Facemesh({landmarks, CT, Cal, MT, Skin, WSP}) {
+function FacemeshControl({landmarks, CT, Cal, MT, Skin}) {
   const calibrate = Cal.getter;
   const setCalibrate = Cal.setter;
   const manualTransformation = MT.getter;
@@ -35,34 +35,16 @@ function Facemesh({landmarks, CT, Cal, MT, Skin, WSP}) {
 
   if (landmarks === undefined) {
     landmarks = mock_data;
-    const defaultTrans = {
-      trans: [-mock_data[0].x, -mock_data[0].y+0.04, -mock_data[0].z],
-      rotate: new THREE.Quaternion(0.9980121, -0.0152293, -0.0399953, 0.0462641),
-      //rotate: new THREE.Euler(3.0500366164090065, -0.0813303473740931, 0.026789092118113494, 'XYZ')
-    };
-    if (JSON.stringify(transformation) !== JSON.stringify(defaultTrans))
-      setTransformation(defaultTrans);
-  }
-
-  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks, Skin.getter);
-
-  if (WSP !== undefined) {
-    // TODO: Send transform/skin data every 5 seconds only
-    // Fast encoder doc: https://gist.github.com/enepomnyaschih/72c423f727d395eeaa09697058238727
-    // https://tutorialspots.com/webrtc-error-rtcdatachannel-send-queue-is-full-7200.html
-    const pack = JSON.stringify({dbPoints: dbPoints, manualTransformation: manualTransformation, transformation: transformation, skin: Skin.getter});
-    // https://stackoverflow.com/questions/20706783/put-byte-array-to-json-and-vice-versa
-    const bytes = btoa(pack);
-    console.log(bytes);
-    WSP.sendFacemeshData("hello");
   }
   
+  const points = l2t.map2meshPoints(landmarks);
+
   return (
-    <FacemeshDisplay manualTransformation={manualTransformation} transformation={transformation} dbPoints={dbPoints} colors={colors} itemSize={itemSize} />
+    <Facemesh manualTransformation={manualTransformation} transformation={transformation} points={points} skin={Skin.getter} />
   );
 }
 
-function FacemeshDisplay({manualTransformation, transformation, dbPoints, colors, itemSize, local=true}) {
+function Facemesh({manualTransformation, transformation, points, skin, itemSize=3, local=true}) {
   var geometry = local_geometry;
   if (local === false) {
     geometry = remote_geometry;
@@ -71,6 +53,8 @@ function FacemeshDisplay({manualTransformation, transformation, dbPoints, colors
   if (geometry !== undefined)
     geometry.dispose();
   geometry = new THREE.BufferGeometry();
+  const dbPoints = l2t.doubleSidedPoints(points);
+  const colors = l2t.generateColor(skin, dbPoints.length / 3);
   geometry.setAttribute("position", new THREE.BufferAttribute(dbPoints, itemSize, false));
   //geometry.setAttribute("normal",  new THREE.BufferAttribute(normals, itemSize, true));
   geometry.setAttribute("color",  new THREE.BufferAttribute(colors, itemSize, false));
@@ -95,7 +79,7 @@ function FacemeshDisplay({manualTransformation, transformation, dbPoints, colors
   )
 }
 
-export {Facemesh, FacemeshDisplay};
+export {FacemeshControl, Facemesh};
 
 // <customShaderMaterial />
 // <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />

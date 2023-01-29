@@ -61,16 +61,13 @@ class WebSocketPeering {
     peer.ondatachannel = (event) => {
       event.channel.onmessage = (event) => {
         // PeerConnection DataChannel Listener
-        const payload = JSON.parse(event.data);
+        //const payload = JSON.parse(event.data);
 
-        if (payload.message_type === MESSAGE_TYPE.push) {
-          console.log(`[peer] recieved: ${payload.message}`);
-        }
-
-        if (payload.message_type === MESSAGE_TYPE.facemeshData) {
-          if (this.facemeshDataHandler !== undefined) { 
-            this.facemeshDataHandler(payload.message);
-          }
+        // if (payload.message_type === MESSAGE_TYPE.push) {
+        //   console.log(`[peer] recieved: ${payload.message}`);
+        // }
+        if (this.facemeshDataHandler !== undefined) { 
+          this.facemeshDataHandler(event.data);
         }
       };
     };
@@ -130,7 +127,7 @@ class WebSocketPeering {
       }
     }
 
-    // 5. Owner retrieves a local ICE candidate TODO: how to trigger this?
+    // 5. Owner retrieves a local ICE candidate
     peer.addEventListener('icecandidate', event => {
       if (event.candidate) {
         socket.send(JSON.stringify({message_type: MESSAGE_TYPE.newIceCandidate, message: event.candidate}));
@@ -211,7 +208,7 @@ class WebSocketPeering {
 
   sendFacemeshData(message) {
     if (this.dc_open) {
-      this.dc.send(JSON.stringify({message_type: MESSAGE_TYPE.facemeshData, message: message}));
+      this.dc.send(message);
     }
   }
 

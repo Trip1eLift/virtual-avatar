@@ -1,6 +1,6 @@
 import './Scene.css';
 import MediapipeCameraWrapper from "./MediapipeCameraWrapper";
-import {Facemesh, FacemeshDisplay} from './facemesh/Facemesh';
+import {Facemesh, FacemeshControl} from './facemesh/Facemesh';
 import { useState, Suspense, useEffect, useRef } from 'react';
 import { Canvas } from "@react-three/fiber";
 import TopBar from './TopBar';
@@ -8,19 +8,17 @@ import * as THREE from 'three';
 //import { OrbitControls } from '@react-three/drei';
 import WebSocketPeering from './client2client/websocket-peering';
 import Landmarks_to_triangles from './facemesh/landmarks2triangle';
+import { encodeFacemesh, decodeFacemesh } from './facemesh/encodeMeshData';
+import mock_data from './facemesh/landmarks-mock.json';
 
 const l2t = new Landmarks_to_triangles();
 
 const backendUrl = "ws://localhost:5000";
-//const wsp = new WebSocketPeering();
 
 /**
  * TODO:
- * 1. Resolve datachannel issue by sending landmarks using track
- * 
- * 4. Add copy link (domain name + query) http://localhost:3000/?room=3
- * 
- * 5. Handle domain name with query
+ * 1. Add copy link (domain name + query) http://localhost:3000/?room=3
+ * 2. Handle domain name with query
  */
 
 export default function App() {
@@ -53,24 +51,27 @@ export default function App() {
         remoteMedia.current.play();
       };
     }
-    WSP.handleFacemeshData((bytes) => {
-      // console.log("recieving data...");
-      // console.log(data);
-      // TODO: recieve data here
-      
-      // var facemesh = {dbPoints: dbPoints};
-      // facemesh.manualTransformation = data.manualTransformation ? data.manualTransformation : remoteFacemesh.manualTransformation;
-      // facemesh.transformation       = data.transformation       ? data.transformation       : remoteFacemesh.transformation;
-      // facemesh.colors               = data.skin != undefined    ? l2t.generateColor(data.skin, dbPoints.length / 3) : remoteFacemesh.colors;
-      
-      console.log(bytes);
-      // var data = JSON.parse(atob(bytes));
-      // data.colors =  l2t.generateColor(data.skin, data.dbPoints.length / 3);
-      //setRemoteFacemesh(data);
+    WSP.handleFacemeshData((buffer) => {
+      //console.log(buffer);
+      const obj = decodeFacemesh(buffer);
+      setRemoteFacemesh(obj);
     });
 
     setWsp(WSP);
   }, []);
+
+  useEffect(() => {
+    // Encode and send data here
+    if (wsp !== undefined) {
+      var buffer;
+      if (landmarks === undefined) {
+        buffer = encodeFacemesh(skin, manualTransformation, calibrateTransformation, mock_data);
+      } else {
+        buffer = encodeFacemesh(skin, manualTransformation, calibrateTransformation, landmarks);
+      }
+      wsp.sendFacemeshData(buffer);
+    }
+  }, [landmarks]);
 
   function saveSettings() {
     const settings = {_Cal: Cal.getter, _CT: CT.getter, _MT: MT.getter, _MTC: MTC.getter, _Skin: Skin.getter}
@@ -102,7 +103,7 @@ export default function App() {
   return (
     <>
       <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} Stream={Stream} WSP={wsp} />
-      {true && <MediapipeCameraWrapper setLandmarks={setLandmarks} WSP={wsp} />}
+      {true && <MediapipeCameraWrapper setLandmarks={setLandmarks} setCalibrateTransformation={setCalibrateTransformation} WSP={wsp} />}
       <div style={canvasStyle(stream.start)}>
         {true && <Canvas>
           {/*<OrbitControls />*/}
@@ -111,7 +112,7 @@ export default function App() {
           <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
 
           <Suspense fallback={null}>
-            <Facemesh landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} WSP={wsp} />
+            <FacemeshControl landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} WSP={wsp} />
           </Suspense>
         </Canvas>}
       </div>
@@ -122,7 +123,7 @@ export default function App() {
           <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
 
           <Suspense fallback={null}>
-            <FacemeshDisplay manualTransformation={remoteFacemesh.manualTransformation} transformation={remoteFacemesh.transformation} dbPoints={remoteFacemesh.dbPoints} colors={remoteFacemesh.colors} itemSize={3} />
+            <Facemesh manualTransformation={remoteFacemesh.manualTransformation} transformation={remoteFacemesh.calibrateTransformation} points={remoteFacemesh.points} skin={remoteFacemesh.skin} />
           </Suspense>
         </Canvas>}
       </div>

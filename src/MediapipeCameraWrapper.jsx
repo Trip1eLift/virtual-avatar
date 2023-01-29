@@ -2,6 +2,8 @@ import * as FM from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 import Webcam from 'react-webcam';
 import { useRef, useEffect } from 'react';
+import mock_data from './facemesh/landmarks-mock.json';
+import * as THREE from 'three';
 
 const videoConstraints = {
   facingMode: "user"
@@ -19,7 +21,7 @@ const audioConstraints = {
   echoCancellation: true,
 };
 
-export default function MediapipeCameraWrapper({setLandmarks, WSP}) {
+export default function MediapipeCameraWrapper({setLandmarks, setCalibrateTransformation, WSP}) {
 
   const webcamRef = useRef(null);
   let camera = null;
@@ -41,10 +43,14 @@ export default function MediapipeCameraWrapper({setLandmarks, WSP}) {
     faceMesh.onResults((results) => {
       if (results.multiFaceLandmarks) {
         const landmarks = results.multiFaceLandmarks[0];
-
-        // TODO: Send landmarks data here using track
-
         setLandmarks(landmarks);
+      } else {
+        setLandmarks(mock_data);
+        const defaultTrans = {
+          trans: [-mock_data[0].x, -mock_data[0].y+0.04, -mock_data[0].z],
+          rotate: new THREE.Quaternion(0.9980121, -0.0152293, -0.0399953, 0.0462641),
+        };
+        setCalibrateTransformation(defaultTrans);
       }
       
     }); // callback

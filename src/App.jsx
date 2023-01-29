@@ -7,13 +7,9 @@ import TopBar from './TopBar';
 import * as THREE from 'three';
 //import { OrbitControls } from '@react-three/drei';
 import WebSocketPeering from './client2client/websocket-peering';
-import Landmarks_to_triangles from './facemesh/landmarks2triangle';
 import { encodeFacemesh, decodeFacemesh } from './facemesh/encodeMeshData';
-import mock_data from './facemesh/landmarks-mock.json';
 
-const l2t = new Landmarks_to_triangles();
-
-const backendUrl = "ws://localhost:5000";
+const backendUrl = "wss://virtualavatar-stream.trip1elift.com/";
 
 /**
  * TODO:
@@ -43,32 +39,30 @@ export default function App() {
   const Skin = {getter: skin, setter: setSkin};
   const Stream = {getter: stream, setter: setStream};
 
-  useEffect(() => {
-    const WSP = new WebSocketPeering();
-    if (typeof(remoteMedia.current) !== "undefined" && remoteMedia.current !== null) {
-      remoteMedia.current.srcObject = WSP.getRemoteStream();
-      remoteMedia.current.onloadedmetadata = function(e) {
-        remoteMedia.current.play();
-      };
-    }
-    WSP.handleFacemeshData((buffer) => {
-      //console.log(buffer);
-      const obj = decodeFacemesh(buffer);
-      setRemoteFacemesh(obj);
-    });
+  // TODO: move this to when create room or join room is clicked
+  // // Handle remote streaming data
+  // useEffect(() => {
+  //   const WSP = new WebSocketPeering();
+  //   if (typeof(remoteMedia.current) !== "undefined" && remoteMedia.current !== null) {
+  //     remoteMedia.current.srcObject = WSP.getRemoteStream();
+  //     remoteMedia.current.onloadedmetadata = function(e) {
+  //       remoteMedia.current.play();
+  //     };
+  //   }
+  //   WSP.handleFacemeshData((buffer) => {
+  //     //console.log(buffer);
+  //     const obj = decodeFacemesh(buffer);
+  //     setRemoteFacemesh(obj);
+  //   });
 
-    setWsp(WSP);
-  }, []);
+  //   setWsp(WSP);
+  // }, []);
 
+  // Send streaming data to remote
   useEffect(() => {
     // Encode and send data here
-    if (wsp !== undefined) {
-      var buffer;
-      if (landmarks === undefined) {
-        buffer = encodeFacemesh(skin, manualTransformation, calibrateTransformation, mock_data);
-      } else {
-        buffer = encodeFacemesh(skin, manualTransformation, calibrateTransformation, landmarks);
-      }
+    if (wsp !== undefined && landmarks !== undefined) {
+      const buffer = encodeFacemesh(skin, manualTransformation, calibrateTransformation, landmarks);
       wsp.sendFacemeshData(buffer);
     }
   }, [landmarks]);

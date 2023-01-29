@@ -6,7 +6,8 @@ import mock_data from './facemesh/landmarks-mock.json';
 import * as THREE from 'three';
 
 const videoConstraints = {
-  facingMode: "user"
+  facingMode: "user",
+  frameRate: { ideal: 15, max: 30 }
 };
 
 const videoStyle = {
@@ -31,7 +32,6 @@ export default function MediapipeCameraWrapper({setLandmarks, setCalibrateTransf
     const faceMesh = new FM.FaceMesh({
       locateFile:(file)=>{
         return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`; // load model file
-        // https://google.github.io/mediapipe/solutions/face_mesh#:~:text=return%20%60https%3A//cdn.jsdelivr.net/npm/%40mediapipe/face_mesh/%24%7Bfile%7D%60%3B
       }
     });
     faceMesh.setOptions({

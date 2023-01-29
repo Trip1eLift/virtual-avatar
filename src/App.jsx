@@ -13,9 +13,8 @@ const backendUrl = "ws://localhost:5000";
 
 /**
  * TODO:
- * 1. Add chat popup panel as a top bar button
- * 2. Add creat room to the panel (zoom self to left 50%)
- * 3. Add join room input and button
+ * 1. Resolve datachannel issue by sending landmarks using track
+ * 
  * 4. Add copy link (domain name + query) http://localhost:3000/?room=3
  * 
  * 5. Handle domain name with query
@@ -87,22 +86,16 @@ export default function App() {
     setFirstUdf(false);
   }
 
-  function onResults(results) {
-    if (results.multiFaceLandmarks) {
-      setLandmarks(results.multiFaceLandmarks[0]);
-    }
-  }
-
-  var canvasStyle = { position: "relative", width: "100%", height: "100%" };
-  if (stream.start) {
-    canvasStyle = { display: "inline-block", position: "relative", width: "49%", height: "50%", borderStyle: "solid", borderWidth: "3px", borderColor: "white", borderRadius: "5px" };
-  }
+  // TODO: Send data to remote here every 5 seconds only
+  // if (wsp !== undefined) {
+  //   wsp.sendFacemeshData({manualTransformation: manualTransformation, transformation: calibrateTransformation, skin: Skin.getter});
+  // }
 
   return (
     <>
       <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} Stream={Stream} WSP={wsp} />
-      {true && <MediapipeCameraWrapper onResults={onResults} WSP={wsp} />}
-      <div style={canvasStyle}>
+      {true && <MediapipeCameraWrapper setLandmarks={setLandmarks} WSP={wsp} />}
+      <div style={canvasStyle(stream.start)}>
         {true && <Canvas>
           {/*<OrbitControls />*/}
           <ambientLight intensity={0.1} />
@@ -114,7 +107,7 @@ export default function App() {
           </Suspense>
         </Canvas>}
       </div>
-      <div style={canvasStyle}>
+      <div style={canvasStyle(stream.start)}>
         {remoteFacemesh !== undefined && <Canvas>
           <ambientLight intensity={0.1} />
           <spotLight position={[10, 15, 20]} angle={0.5} intensity={0.8}/>
@@ -128,4 +121,12 @@ export default function App() {
       <audio ref={remoteMedia} autoPlay />
     </>
   );
+}
+
+function canvasStyle(stream_start) {
+  if (stream_start) {
+    return { display: "inline-block", position: "relative", width: "49%", height: "50%", borderStyle: "solid", borderWidth: "3px", borderColor: "white", borderRadius: "5px" };
+  } else {
+    return { position: "relative", width: "100%", height: "100%" };
+  }
 }

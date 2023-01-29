@@ -19,7 +19,7 @@ const audioConstraints = {
   echoCancellation: true,
 };
 
-export default function MediapipeCameraWrapper({onResults, WSP}) {
+export default function MediapipeCameraWrapper({setLandmarks, WSP}) {
 
   const webcamRef = useRef(null);
   let camera = null;
@@ -38,7 +38,16 @@ export default function MediapipeCameraWrapper({onResults, WSP}) {
       minTrackingConfidence: 0.5
     });
 
-    faceMesh.onResults(onResults); // callback
+    faceMesh.onResults((results) => {
+      if (results.multiFaceLandmarks) {
+        const landmarks = results.multiFaceLandmarks[0];
+
+        // TODO: Send landmarks data here using track
+
+        setLandmarks(landmarks);
+      }
+      
+    }); // callback
 
     if (typeof(webcamRef.current) !== "undefined" && webcamRef.current !== null) {
       //console.log(webcamRef.current.video);

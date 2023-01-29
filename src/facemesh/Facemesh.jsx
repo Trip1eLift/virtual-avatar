@@ -44,11 +44,6 @@ function Facemesh({landmarks, CT, Cal, MT, Skin, WSP}) {
       setTransformation(defaultTrans);
   }
   
-  // Send data to remote here
-  if (WSP !== undefined) {
-    WSP.sendFacemeshData({manualTransformation: manualTransformation, transformation: transformation, landmarks: landmarks, skin: Skin.getter});
-  }
-  
   return (
     <FacemeshDisplay manualTransformation={manualTransformation} transformation={transformation} landmarks={landmarks} skin={Skin.getter} />
   );
@@ -70,46 +65,6 @@ function FacemeshDisplay({manualTransformation, transformation, landmarks, skin,
   geometry.setAttribute("color",  new THREE.BufferAttribute(colors, itemSize, false));
 
   //extend({ CustomShaderMaterial });
-
-  const expand = 20;
-  return (
-    <group scale={[-1.5*expand, expand, expand]}>
-      <group position={manualTransformation.trans}>
-        <group rotation={new THREE.Euler().setFromQuaternion( manualTransformation.rotate )} >
-          <group rotation={new THREE.Euler().setFromQuaternion( transformation.rotate )} >
-            <group position={transformation.trans}>
-              <mesh geometry={geometry}>
-                <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
-              </mesh>
-            </group>
-          </group>
-        </group>
-      </group>
-    </group>
-  )
-}
-
-function FacemeshDisplayRemote({manualTransformation, transformation, landmarks, skin, local=true}) {
-  console.log("recieving data...1");
-  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks, skin);
-
-  console.log("recieving data...2");
-
-  var geometry = local_geometry;
-  if (local === false) {
-    geometry = remote_geometry;
-  }
-  // setAttribute force upload to GPU on hook
-  if (geometry !== undefined)
-    geometry.dispose();
-  geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.BufferAttribute(dbPoints, itemSize, false));
-  //geometry.setAttribute("normal",  new THREE.BufferAttribute(normals, itemSize, true));
-  geometry.setAttribute("color",  new THREE.BufferAttribute(colors, itemSize, false));
-
-  //extend({ CustomShaderMaterial });
-
-  console.log("recieving data...3");
 
   const expand = 20;
   return (

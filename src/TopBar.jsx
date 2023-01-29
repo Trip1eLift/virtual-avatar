@@ -13,13 +13,15 @@ import Paper from '@mui/material/Paper';
 import Draggable from 'react-draggable';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import About from './About';
 
-export default function TopBar({Cal, MT, MTC, Settings, Skin}) {
+export default function TopBar({Cal, MT, MTC, Settings, Skin, Stream}) {
 	const [meshControlDialog, setMeshControlDialog] = useState(false);
 	const [about, setAbout] = useState(false);
+	const [streamControlDialog, setStreamControlDialog] = useState(false);
 	const skin = Skin.getter;
 	const setSkin = Skin.setter;
 
@@ -28,17 +30,11 @@ export default function TopBar({Cal, MT, MTC, Settings, Skin}) {
       <AppBar position="static" style={{backgroundColor:"grey"}}>
         <Toolbar>
 					<MeshControlDraggableDialog open={meshControlDialog} setOpen={setMeshControlDialog} Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} />
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-            onClick={(e)=>setMeshControlDialog(true)}
-          >
+          <IconButton onClick={(e)=>setMeshControlDialog(true)} size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
-					<Button color="inherit" onClick={(e)=>{}}>Stream</Button>
+					<StreamControlDialog open={streamControlDialog} setOpen={setStreamControlDialog} Stream={Stream} />
+					<Button color="inherit" onClick={(e)=>setStreamControlDialog(true)}>Stream</Button>
           <Typography variant="h6" component="div" align="center" sx={{ flexGrow: 1 }}>
             <div style={{cursor:"default"}}>Virtual Avatar</div>
           </Typography>
@@ -148,5 +144,54 @@ function MeshControlPanel({MT, MTC}) {
 				<Slider value={roll} onChange={(e, val)=>setRoll(val)} />
       </Stack>
 		</div>
+	)
+}
+
+function StreamControlDialog({open, setOpen, Stream}) {
+	const [roomId, setRoomId] = useState();
+	const [disableRoomField, setDisableRoomField] = useState(false);
+	const stream = Stream.getter;
+	const setStream = Stream.setter;
+
+	function createRoom(event) {
+		setDisableRoomField(true);
+		stream.wsp.ownerConn(stream.url, setRoomId);
+		setStream({start: true, url: stream.url, wsp: stream.wsp});
+	}
+
+	function joinRoom(event) {
+		// Click joinRoom to release roomField if it was locked.
+		if (disableRoomField) {
+			setDisableRoomField(false);
+			setStream({start: false, url: stream.url, wsp: stream.wsp});
+			return;
+		}
+
+		stream.wsp.guestConn(stream.url, roomId);
+		setStream({start: true, url: stream.url, wsp: stream.wsp});
+	}
+
+	function copyRoomUrl(event) {
+		console.log("This functionality will be added later...");
+	}
+
+	return (
+		<Dialog
+			open={open}
+			onClose={()=>setOpen(false)}
+			PaperComponent={DraggablePaper}
+      aria-labelledby="draggable-dialog-title"
+		>
+			<DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
+				Stream Control
+			</DialogTitle>
+			<TextField onChange={(e)=>setRoomId(e.target.value)} disabled={disableRoomField} InputLabelProps={{ shrink: disableRoomField }} value={roomId} id="outlined-multiline-flexible" label="joining room id" multiline maxRows={4} style={{width: "94%", margin: "5px", marginLeft: "3%", marginRight: "3%"}} />
+			<DialogActions>
+				<Button onClick={createRoom}>Create Room</Button>
+				<Button onClick={joinRoom}>Join Room</Button>
+				<Button onClick={copyRoomUrl}>Copy Room Url</Button>
+				<Button autoFocus onClick={()=>setOpen(false)}>Close</Button>
+			</DialogActions>
+    </Dialog>
 	)
 }

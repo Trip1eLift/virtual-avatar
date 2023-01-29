@@ -1,11 +1,14 @@
 import './Scene.css';
 import MediapipeCameraWrapper from "./MediapipeCameraWrapper";
 import Facemesh from './facemesh/Facemesh';
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect, useRef } from 'react';
 import { Canvas } from "@react-three/fiber";
 import TopBar from './TopBar';
 import * as THREE from 'three';
 //import { OrbitControls } from '@react-three/drei';
+import WebSocketPeering from './client2client/websocket-peering';
+
+const backendUrl = "ws://localhost:5000";
 
 /**
  * TODO:
@@ -26,13 +29,25 @@ export default function App() {
   const [manualTransformation, setManualTransformation] = useState({trans: [0, 0, 0], rotate: new THREE.Quaternion()});
   const [manualTransformationControl, setManualTransformationControl] = useState({x_pos: 50, y_pos: 50, z_pos: 50, yaw: 50, pitch:50, roll: 50});
   const [skin, setSkin] = useState(0);
-  const [streaming, setStreaming] = useState(true);
+  const [stream, setStream] = useState({start: false, url: backendUrl, wsp: new WebSocketPeering});
 
   const Cal = {getter: calibrate, setter: setCalibrate};
   const CT = {getter: calibrateTransformation, setter: setCalibrateTransformation};
   const MT = {getter: manualTransformation, setter: setManualTransformation};
   const MTC = {getter: manualTransformationControl, setter: setManualTransformationControl};
   const Skin = {getter: skin, setter: setSkin};
+  const Stream = {getter: stream, setter: setStream};
+
+  const remoteMedia = useRef(null);
+
+  useEffect(() => {
+    if (typeof(remoteMedia.current) !== "undefined" && remoteMedia.current !== null) {
+      remoteMedia.current.srcObject = stream.wsp.getRemoteStream();
+      remoteMedia.current.onloadedmetadata = function(e) {
+        remoteMedia.current.play();
+      };
+    }
+  }, []);
 
   function saveSettings() {
     const settings = {_Cal: Cal.getter, _CT: CT.getter, _MT: MT.getter, _MTC: MTC.getter, _Skin: Skin.getter}
@@ -69,15 +84,15 @@ export default function App() {
   }
 
   var canvasStyle = { position: "relative", width: "100%", height: "100%" };
-  if (streaming === true) {
+  if (stream.start === true) {
     canvasStyle = { position: "relative", width: "49%", height: "50%", borderStyle: "solid", borderWidth: "3px", borderColor: "white", borderRadius: "5px" };
   }
 
   return (
     <>
-      <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} />
+      <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} Stream={Stream} />
 
-      {false && <MediapipeCameraWrapper onResults={onResults}/>}
+      {true && <MediapipeCameraWrapper onResults={onResults} Stream={Stream} />}
       <div style={canvasStyle}>
         <Canvas>
           {/*<OrbitControls />*/}
@@ -89,6 +104,7 @@ export default function App() {
             <Facemesh landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} />
           </Suspense>
         </Canvas>
+        <audio ref={remoteMedia} autoPlay />
       </div>
   </>
   );

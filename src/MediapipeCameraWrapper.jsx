@@ -3,9 +3,26 @@ import * as cam from '@mediapipe/camera_utils';
 import Webcam from 'react-webcam';
 import { useRef, useEffect } from 'react';
 
-export default function MediapipeCameraWrapper({onResults}) {
+const videoConstraints = {
+  facingMode: "user"
+};
+
+const videoStyle = {
+  visibility: "hidden",
+  width: 0,
+  height: 0
+};
+
+const audioConstraints = {
+  suppressLocalAudioPlayback: true,
+  noiseSuppression: true,
+  echoCancellation: true,
+};
+
+export default function MediapipeCameraWrapper({onResults, Stream}) {
 
   const webcamRef = useRef(null);
+  const wsp = Stream.getter.wsp;
   let camera = null;
 
   useEffect(() => {
@@ -37,17 +54,15 @@ export default function MediapipeCameraWrapper({onResults}) {
     }
   }, []);
 
-  const videoConstraints = {
-    facingMode: "user"
-  };
-
-  const videoStyle = {
-    visibility: "hidden",
-    width: 0,
-    height: 0
-  }
-
   return (
-    <Webcam videoConstraints={videoConstraints} ref={webcamRef} style={videoStyle} />
+    <Webcam 
+      videoConstraints={videoConstraints}
+      audioConstraints={audioConstraints}
+      style={videoStyle} 
+      audio={true}
+      muted={true}
+      ref={webcamRef}
+      onUserMedia={(stream)=>wsp.onUserMedia(stream)}
+    />
   );
 }

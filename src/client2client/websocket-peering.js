@@ -75,7 +75,7 @@ class WebSocketPeering {
     };
     
     datachannel.onclose = () => {
-      console.log("[peer]");
+      console.log("[peer] Connection close.");
     };
 
     this.socket = undefined;

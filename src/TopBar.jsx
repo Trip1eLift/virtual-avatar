@@ -185,7 +185,7 @@ function StreamControlDialog({open, setOpen, Stream, WSP}) {
 			<DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
 				Stream Control
 			</DialogTitle>
-			<TextField onChange={(e)=>setRoomId(e.target.value)} disabled={disableRoomField} InputLabelProps={{ shrink: disableRoomField }} value={roomId} id="outlined-multiline-flexible" label="joining room id" multiline maxRows={4} style={{width: "94%", margin: "5px", marginLeft: "3%", marginRight: "3%"}} />
+			<TextField onChange={(e)=>setRoomId(e.target.value)} disabled={disableRoomField} InputLabelProps={{ shrink: true }} value={roomId} id="outlined-multiline-flexible" label="joining room id" multiline maxRows={4} style={{width: "94%", margin: "5px", marginLeft: "3%", marginRight: "3%"}} />
 			<DialogActions>
 				<Button onClick={createRoom}>Create Room</Button>
 				<Button onClick={joinRoom}>Join Room</Button>

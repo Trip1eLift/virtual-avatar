@@ -43,11 +43,12 @@ const MESSAGE_TYPE = {
   offerPeerConnection:  'offer-peer-connection',
   answerPeerConnection: 'answer-peer-connection',
   newIceCandidate:      'new-ice-candidate',
+  facemeshData:         'facemesh-data',
 };
 
 class WebSocketPeering {
   constructor(streamVideo = false) {
-    console.log("Constructing wsp...");
+    // console.log("Constructing wsp..."); // Debuging for constrcutor spamming
     const peer = new RTCPeerConnection(ICE_config, Peer_options);
     const remoteStream = new MediaStream();
 
@@ -65,6 +66,12 @@ class WebSocketPeering {
         if (payload.message_type === MESSAGE_TYPE.push) {
           console.log(`[peer] recieved: ${payload.message}`);
         }
+
+        if (payload.message_type === MESSAGE_TYPE.facemeshData) {
+          if (this.facemeshDataHandler !== undefined) { 
+            this.facemeshDataHandler(payload.message);
+          }
+        }
       };
     };
 
@@ -73,6 +80,7 @@ class WebSocketPeering {
     datachannel.onopen = () => {
       console.log("[peer] Connection established; Closing websocket");
       this.socket.close(1000, "websocket is no longer needed.");
+      this.dc_open = true;
     };
     
     datachannel.onclose = () => {
@@ -82,12 +90,10 @@ class WebSocketPeering {
     this.socket = undefined;
     this.peer = peer;
     this.dc = datachannel;
+    this.dc_open = false;
     this.remoteStream = remoteStream;
     this.streamVideo = streamVideo;
-  }
-
-  test() {
-    console.log("test function here")
+    this.facemeshDataHandler = undefined;
   }
 
   ownerConn(url, setRoomId) {
@@ -201,6 +207,16 @@ class WebSocketPeering {
 
   boolStreamVideo() {
     return this.streamVideo;
+  }
+
+  sendFacemeshData(message) {
+    if (this.dc_open) {
+      this.dc.send(JSON.stringify({message_type: MESSAGE_TYPE.facemeshData, message: message}));
+    }
+  }
+
+  handleFacemeshData(callback) {
+    this.facemeshDataHandler = callback;
   }
 
   sendUuid() {

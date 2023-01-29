@@ -6,9 +6,10 @@ import {useEffect} from 'react';
 //import { extend } from "@react-three/fiber";
 
 const l2t = new Landmarks_to_triangles();
-let geometry;
+let local_geometry;
+let remote_geometry;
 
-export default function Facemesh({landmarks, CT, Cal, MT, Skin}) {
+function Facemesh({landmarks, CT, Cal, MT, Skin, WSP}) {
   const calibrate = Cal.getter;
   const setCalibrate = Cal.setter;
   const manualTransformation = MT.getter;
@@ -42,10 +43,24 @@ export default function Facemesh({landmarks, CT, Cal, MT, Skin}) {
     if (JSON.stringify(transformation) !== JSON.stringify(defaultTrans))
       setTransformation(defaultTrans);
   }
-    
+  
+  // Send data to remote here
+  if (WSP !== undefined) {
+    WSP.sendFacemeshData({manualTransformation: manualTransformation, transformation: transformation, landmarks: landmarks, skin: Skin.getter});
+  }
+  
+  return (
+    <FacemeshDisplay manualTransformation={manualTransformation} transformation={transformation} landmarks={landmarks} skin={Skin.getter} />
+  );
+}
 
-  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks, Skin.getter);
+function FacemeshDisplay({manualTransformation, transformation, landmarks, skin, local=true}) {
+  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks, skin);
 
+  var geometry = local_geometry;
+  if (local === false) {
+    geometry = remote_geometry;
+  }
   // setAttribute force upload to GPU on hook
   if (geometry !== undefined)
     geometry.dispose();
@@ -55,24 +70,66 @@ export default function Facemesh({landmarks, CT, Cal, MT, Skin}) {
   geometry.setAttribute("color",  new THREE.BufferAttribute(colors, itemSize, false));
 
   //extend({ CustomShaderMaterial });
-  
+
   const expand = 20;
   return (
-      <group scale={[-1.5*expand, expand, expand]}>
-        <group position={manualTransformation.trans}>
-          <group rotation={new THREE.Euler().setFromQuaternion( manualTransformation.rotate )} >
-            <group rotation={new THREE.Euler().setFromQuaternion( transformation.rotate )} >
-              <group position={transformation.trans}>
-                <mesh geometry={geometry}>
-                  <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
-                </mesh>
-              </group>
+    <group scale={[-1.5*expand, expand, expand]}>
+      <group position={manualTransformation.trans}>
+        <group rotation={new THREE.Euler().setFromQuaternion( manualTransformation.rotate )} >
+          <group rotation={new THREE.Euler().setFromQuaternion( transformation.rotate )} >
+            <group position={transformation.trans}>
+              <mesh geometry={geometry}>
+                <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
+              </mesh>
             </group>
           </group>
         </group>
       </group>
-    );
+    </group>
+  )
 }
+
+function FacemeshDisplayRemote({manualTransformation, transformation, landmarks, skin, local=true}) {
+  console.log("recieving data...1");
+  const [dbPoints, normals, colors, itemSize, count] = l2t.map2DoublePoints(landmarks, skin);
+
+  console.log("recieving data...2");
+
+  var geometry = local_geometry;
+  if (local === false) {
+    geometry = remote_geometry;
+  }
+  // setAttribute force upload to GPU on hook
+  if (geometry !== undefined)
+    geometry.dispose();
+  geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(dbPoints, itemSize, false));
+  //geometry.setAttribute("normal",  new THREE.BufferAttribute(normals, itemSize, true));
+  geometry.setAttribute("color",  new THREE.BufferAttribute(colors, itemSize, false));
+
+  //extend({ CustomShaderMaterial });
+
+  console.log("recieving data...3");
+
+  const expand = 20;
+  return (
+    <group scale={[-1.5*expand, expand, expand]}>
+      <group position={manualTransformation.trans}>
+        <group rotation={new THREE.Euler().setFromQuaternion( manualTransformation.rotate )} >
+          <group rotation={new THREE.Euler().setFromQuaternion( transformation.rotate )} >
+            <group position={transformation.trans}>
+              <mesh geometry={geometry}>
+                <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />
+              </mesh>
+            </group>
+          </group>
+        </group>
+      </group>
+    </group>
+  )
+}
+
+export {Facemesh, FacemeshDisplay};
 
 // <customShaderMaterial />
 // <meshStandardMaterial attach="material" color="hotpink" flatShading={true} vertexColors={true} />

@@ -1,6 +1,6 @@
 import './Scene.css';
 import MediapipeCameraWrapper from "./MediapipeCameraWrapper";
-import Facemesh from './facemesh/Facemesh';
+import {Facemesh, FacemeshDisplay} from './facemesh/Facemesh';
 import { useState, Suspense, useEffect, useRef } from 'react';
 import { Canvas } from "@react-three/fiber";
 import TopBar from './TopBar';
@@ -32,6 +32,9 @@ export default function App() {
   const [skin, setSkin] = useState(0);
   const [stream, setStream] = useState({start: false, url: backendUrl});
   const [wsp, setWsp] = useState();
+  const [remoteFacemesh, setRemoteFacemesh] = useState();
+
+  const remoteMedia = useRef(null);
 
   const Cal = {getter: calibrate, setter: setCalibrate};
   const CT = {getter: calibrateTransformation, setter: setCalibrateTransformation};
@@ -39,8 +42,6 @@ export default function App() {
   const MTC = {getter: manualTransformationControl, setter: setManualTransformationControl};
   const Skin = {getter: skin, setter: setSkin};
   const Stream = {getter: stream, setter: setStream};
-
-  const remoteMedia = useRef(null);
 
   useEffect(() => {
     const WSP = new WebSocketPeering();
@@ -50,6 +51,12 @@ export default function App() {
         remoteMedia.current.play();
       };
     }
+    WSP.handleFacemeshData((data) => {
+      // console.log("recieving data...");
+      // console.log(data);
+      setRemoteFacemesh(data);
+    });
+
     setWsp(WSP);
   }, []);
 
@@ -83,13 +90,12 @@ export default function App() {
   function onResults(results) {
     if (results.multiFaceLandmarks) {
       setLandmarks(results.multiFaceLandmarks[0]);
-      //console.log(results.multiFaceLandmarks[0][0]);
     }
   }
 
   var canvasStyle = { position: "relative", width: "100%", height: "100%" };
-  if (stream) {
-    canvasStyle = { position: "relative", width: "49%", height: "50%", borderStyle: "solid", borderWidth: "3px", borderColor: "white", borderRadius: "5px" };
+  if (stream.start) {
+    canvasStyle = { display: "inline-block", position: "relative", width: "49%", height: "50%", borderStyle: "solid", borderWidth: "3px", borderColor: "white", borderRadius: "5px" };
   }
 
   return (
@@ -104,12 +110,22 @@ export default function App() {
           <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
 
           <Suspense fallback={null}>
-            <Facemesh landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} />
+            <Facemesh landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} WSP={wsp} />
           </Suspense>
         </Canvas>}
-        
-        <audio ref={remoteMedia} autoPlay />
       </div>
-  </>
+      <div style={canvasStyle}>
+        {remoteFacemesh !== undefined && <Canvas>
+          <ambientLight intensity={0.1} />
+          <spotLight position={[10, 15, 20]} angle={0.5} intensity={0.8}/>
+          <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
+
+          <Suspense fallback={null}>
+            <FacemeshDisplay manualTransformation={remoteFacemesh.manualTransformation} transformation={remoteFacemesh.transformation} landmarks={remoteFacemesh.landmarks} skin={remoteFacemesh.skin} local={false}/>
+          </Suspense>
+        </Canvas>}
+      </div>
+      <audio ref={remoteMedia} autoPlay />
+    </>
   );
 }

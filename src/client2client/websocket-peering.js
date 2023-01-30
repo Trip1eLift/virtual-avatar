@@ -1,5 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 
+// TODO: resolve a bug if one user finish stream without refresh.
+//       the other user refresh, and they start streaming
+//       the other user cannot see this user's face because dc_open is not set to true or something else?
+
 const ICE_config = {
   iceServers: [
     {
@@ -37,9 +41,6 @@ const Peer_options = {
  * { message_type: 'answer-peer-connection',  message: answer    } answer = await peerConnection.createAnswer();
  * { message_type: 'new-ice-candidate',       message: candidate }
  */
-
-// TODO: handle cross device peer connection
-
 const MESSAGE_TYPE = {
   push:                 'push',
   startPeerConnection:  'start-peer-connection',

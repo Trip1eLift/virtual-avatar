@@ -46,28 +46,6 @@ function App({WSP}) {
   const Skin = {getter: skin, setter: setSkin};
   const Stream = {getter: stream, setter: setStream};
 
-  // TODO: move this to when create room or join room is clicked
-  // Handle remote streaming data
-  
-
-  // Handle remote streaming data
-  // function roomInteraction() {
-  //   const WSP = new WebSocketPeering();
-  //   if (typeof(remoteMedia.current) !== "undefined" && remoteMedia.current !== null) {
-  //     remoteMedia.current.srcObject = WSP.getRemoteStream();
-  //     remoteMedia.current.onloadedmetadata = function(e) {
-  //       remoteMedia.current.play();
-  //     };
-  //   }
-  //   WSP.handleFacemeshData((buffer) => {
-  //     //console.log(buffer);
-  //     const obj = decodeFacemesh(buffer);
-  //     setRemoteFacemesh(obj);
-  //   });
-  //   setWsp(WSP);
-  //   return WSP;
-  // }
-
   useEffect(() => {
     if (typeof(remoteMedia.current) !== "undefined" && remoteMedia.current !== null) {
       remoteMedia.current.srcObject = WSP.getRemoteStream();

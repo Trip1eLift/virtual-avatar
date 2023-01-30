@@ -3,6 +3,18 @@ resource "aws_s3_bucket" "root_bucket" {
 	bucket = "${var.bucket_name}"
 	policy = templatefile("templates/s3-policy.json", { bucket = "${var.bucket_name}" })
 
+	cors_rule {
+        allowed_headers = ["*"]
+		allowed_methods = ["GET", "POST"]
+		allowed_origins = ["https://${var.bucket_name}"]
+		max_age_seconds = 3000
+    }
+
+    website {
+        error_document = "404.html"
+        index_document = "index.html"
+	}
+
 	tags = var.common_tags
 
 	provisioner "local-exec" {

@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // TODO: resolve a bug if one user finish stream without refresh.
 //       the other user refresh, and they start streaming
-//       the other user cannot see this user's face because dc_open is not set to true or something else?
+//       the other user cannot see this user's face because dc_open is not set to true or something else like onUserMedia?
 
 const ICE_config = {
   iceServers: [

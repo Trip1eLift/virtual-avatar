@@ -83,7 +83,7 @@ class WebSocketPeering {
       this.socket.close(1000, "websocket is no longer needed.");
       this.dc_open = true;
 
-      console.log("7. Peer connection established");
+      //console.log("7. Peer connection established");
     };
     
     datachannel.onclose = () => {

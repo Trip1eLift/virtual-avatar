@@ -4,7 +4,8 @@ import { Quaternion } from 'three';
 // TODO: figure out how to use Float16Array later
 
 function encodeFacemesh(skin, manualTransformation, calibrateTransformation, landmarks) {
-  let buffer = new Float32Array(15 + vertices_mapping.length * 3 * 3);
+  // let points_buffer = new Float32Array(15 + vertices_mapping.length * 3 * 3); // Point buffer:     Size 7683 index -> 30732 bytes
+  let buffer = new Float32Array(15 + landmarks.length * 3);                      // Landmarks buffer: Size 1419 index -> 5676  bytes
   // [skin, MT.trans(3), MT.rotate(4), CT.trans(3), CT.rotate(4), landmarks...]
 
   buffer[0] = skin;
@@ -27,19 +28,11 @@ function encodeFacemesh(skin, manualTransformation, calibrateTransformation, lan
   buffer[13] = calibrateTransformation.rotate._z;
   buffer[14] = calibrateTransformation.rotate._w;
 
-  for (var i = 0; i < vertices_mapping.length; i++) {
-    const offset = i * 9;
-    buffer[offset + 15] = landmarks[vertices_mapping[i][0]].x;
-    buffer[offset + 16] = landmarks[vertices_mapping[i][0]].y;
-    buffer[offset + 17] = landmarks[vertices_mapping[i][0]].z;
-
-    buffer[offset + 18] = landmarks[vertices_mapping[i][1]].x;
-    buffer[offset + 19] = landmarks[vertices_mapping[i][1]].y;
-    buffer[offset + 20] = landmarks[vertices_mapping[i][1]].z;
-
-    buffer[offset + 21] = landmarks[vertices_mapping[i][2]].x;
-    buffer[offset + 22] = landmarks[vertices_mapping[i][2]].y;
-    buffer[offset + 23] = landmarks[vertices_mapping[i][2]].z;
+  for (var i = 0; i < landmarks.length; i++) {
+    const gap = i * 3;
+    buffer[gap + 15] = landmarks[i].x;
+    buffer[gap + 16] = landmarks[i].y;
+    buffer[gap + 17] = landmarks[i].z;
   }
   return buffer;
 }
@@ -58,8 +51,19 @@ function decodeFacemesh(buffer) {
   calibrateTransformation.rotate = new Quaternion(buffer[11], buffer[12], buffer[13], buffer[14]);
 
   var points = new Float32Array(vertices_mapping.length * 3 * 3);
-  for (var i = 0; i < points.length; i++) {
-    points[i] = buffer[i+15];
+  for (var i = 0; i < vertices_mapping.length; i++) {
+    const gap = i * 9;
+    points[gap + 0] = buffer[15 + 3 * vertices_mapping[i][0] + 0];
+    points[gap + 1] = buffer[15 + 3 * vertices_mapping[i][0] + 1];
+    points[gap + 2] = buffer[15 + 3 * vertices_mapping[i][0] + 2];
+
+    points[gap + 3] = buffer[15 + 3 * vertices_mapping[i][1] + 0];
+    points[gap + 4] = buffer[15 + 3 * vertices_mapping[i][1] + 1];
+    points[gap + 5] = buffer[15 + 3 * vertices_mapping[i][1] + 2];
+
+    points[gap + 6] = buffer[15 + 3 * vertices_mapping[i][2] + 0];
+    points[gap + 7] = buffer[15 + 3 * vertices_mapping[i][2] + 1];
+    points[gap + 8] = buffer[15 + 3 * vertices_mapping[i][2] + 2];
   }
 
   return {skin: skin, manualTransformation: manualTransformation, calibrateTransformation: calibrateTransformation, points: points};

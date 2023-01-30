@@ -17,7 +17,14 @@ const backendUrl = "wss://virtualavatar-stream.trip1elift.com/";
  * 2. Handle domain name with query
  */
 
-export default function App() {
+export default function AppRoot() {
+  const [wsp, _] = useState(new WebSocketPeering());
+  return (
+    <App WSP={wsp} />
+  )
+}
+
+function App({WSP}) {
 
   const [landmarks, setLandmarks] = useState(undefined);
   const [firstUdf, setFirstUdf] = useState(true);
@@ -27,7 +34,7 @@ export default function App() {
   const [manualTransformationControl, setManualTransformationControl] = useState({x_pos: 50, y_pos: 50, z_pos: 50, yaw: 50, pitch:50, roll: 50});
   const [skin, setSkin] = useState(0);
   const [stream, setStream] = useState({start: false, url: backendUrl});
-  const [wsp, setWsp] = useState();
+  
   const [remoteFacemesh, setRemoteFacemesh] = useState();
 
   const remoteMedia = useRef(null);
@@ -40,8 +47,11 @@ export default function App() {
   const Stream = {getter: stream, setter: setStream};
 
   // TODO: move this to when create room or join room is clicked
-  // // Handle remote streaming data
-  // useEffect(() => {
+  // Handle remote streaming data
+  
+
+  // Handle remote streaming data
+  // function roomInteraction() {
   //   const WSP = new WebSocketPeering();
   //   if (typeof(remoteMedia.current) !== "undefined" && remoteMedia.current !== null) {
   //     remoteMedia.current.srcObject = WSP.getRemoteStream();
@@ -54,16 +64,30 @@ export default function App() {
   //     const obj = decodeFacemesh(buffer);
   //     setRemoteFacemesh(obj);
   //   });
-
   //   setWsp(WSP);
-  // }, []);
+  //   return WSP;
+  // }
+
+  useEffect(() => {
+    if (typeof(remoteMedia.current) !== "undefined" && remoteMedia.current !== null) {
+      remoteMedia.current.srcObject = WSP.getRemoteStream();
+      remoteMedia.current.onloadedmetadata = function(e) {
+        remoteMedia.current.play();
+      };
+    }
+    WSP.handleFacemeshData((buffer) => {
+      //console.log(buffer);
+      const obj = decodeFacemesh(buffer);
+      setRemoteFacemesh(obj);
+    });
+  }, []);
 
   // Send streaming data to remote
   useEffect(() => {
     // Encode and send data here
-    if (wsp !== undefined && landmarks !== undefined) {
+    if (WSP !== undefined && landmarks !== undefined) {
       const buffer = encodeFacemesh(skin, manualTransformation, calibrateTransformation, landmarks);
-      wsp.sendFacemeshData(buffer);
+      WSP.sendFacemeshData(buffer);
     }
   }, [landmarks]);
 
@@ -96,8 +120,8 @@ export default function App() {
 
   return (
     <>
-      <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} Stream={Stream} WSP={wsp} />
-      <MediapipeCameraWrapper setLandmarks={setLandmarks} setCalibrateTransformation={setCalibrateTransformation} WSP={wsp} />
+      <TopBar Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} Skin={Skin} Stream={Stream} WSP={WSP} />
+      <MediapipeCameraWrapper setLandmarks={setLandmarks} setCalibrateTransformation={setCalibrateTransformation} WSP={WSP} />
       <div style={canvasStyle(stream.start)}>
         <Canvas>
           {/*<OrbitControls />*/}
@@ -106,7 +130,7 @@ export default function App() {
           <spotLight position={[-10, 15, 20]} angle={0.5} intensity={0.4}/>
 
           <Suspense fallback={null}>
-            <FacemeshControl landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} WSP={wsp} />
+            <FacemeshControl landmarks={landmarks} Cal={Cal} CT={CT} MT={MT} Skin={Skin} WSP={WSP} />
           </Suspense>
         </Canvas>
       </div>

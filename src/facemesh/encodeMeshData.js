@@ -70,3 +70,4 @@ function decodeFacemesh(buffer) {
 }
 
 export {encodeFacemesh, decodeFacemesh};
+

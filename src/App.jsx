@@ -16,6 +16,8 @@ const backendUrl = "wss://virtualavatar-stream.trip1elift.com/";
  * TODO:
  * 1. Add copy link (domain name + query) http://localhost:3000/?room=3
  * 2. Handle domain name with query
+ * 
+ * TODO PRIO: find and fix memory leak (It happens without streaming, probably reltated to webgl)
  */
 
 export default function AppRoot() {

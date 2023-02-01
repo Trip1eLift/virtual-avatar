@@ -9,8 +9,8 @@ import * as THREE from 'three';
 import WebSocketPeering from './client2client/websocket-peering';
 import { encodeFacemesh, decodeFacemesh } from './facemesh/encodeMeshData';
 
-//const backendUrl = "wss://virtualavatar-stream.trip1elift.com/";
-const backendUrl = "ws://localhost:5000/";
+const backendUrl = "wss://virtualavatar-stream.trip1elift.com/";
+//const backendUrl = "ws://localhost:5000/";
 
 /**
  * TODO:
@@ -64,7 +64,7 @@ function App({WSP}) {
   // Send streaming data to remote
   useEffect(() => {
     // Encode and send data here
-    if (WSP !== undefined && landmarks !== undefined) {
+    if (WSP !== undefined && landmarks !== undefined && WSP.dc_open === true) {
       const buffer = encodeFacemesh(skin, manualTransformation, calibrateTransformation, landmarks);
       WSP.sendFacemeshData(buffer);
     }

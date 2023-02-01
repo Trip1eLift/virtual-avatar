@@ -43,9 +43,11 @@ function Float16ToFloat32(float16) {
   return floatView[0];
 }
 
-const testCase = [0, 0.5, 1, 15, -13, 123.3, 53.234, 0.00034, 0.0000000000000009346];
-testCase.forEach((num) => {
-  console.log(num, Float32ToFloat16(num), Float16ToFloat32((Float32ToFloat16(num))));
-});
+export { Float32ToFloat16, Float16ToFloat32 };
+
+// const testCase = [0, 0.5, 1, 15, -13, 123.3, 53.234, 0.00034, 0.0000000000000009346];
+// testCase.forEach((num) => {
+//   console.log(num, Float32ToFloat16(num), Float16ToFloat32((Float32ToFloat16(num))));
+// });
 
 // node ./src/facemesh/float16.js

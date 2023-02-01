@@ -25,7 +25,6 @@ const audioConstraints = {
 export default function MediapipeCameraWrapper({setLandmarks, setCalibrateTransformation, WSP}) {
 
   const webcamRef = useRef(null);
-  let camera = null;
 
   useEffect(() => {
     // set ML model
@@ -57,7 +56,7 @@ export default function MediapipeCameraWrapper({setLandmarks, setCalibrateTransf
 
     if (typeof(webcamRef.current) !== "undefined" && webcamRef.current !== null) {
       //console.log(webcamRef.current.video);
-      camera = new cam.Camera(webcamRef.current.video, 
+      const camera = new cam.Camera(webcamRef.current.video, 
         {onFrame:async()=>{
           await faceMesh.send({image:webcamRef.current.video}) // run ML model
         },
@@ -66,7 +65,7 @@ export default function MediapipeCameraWrapper({setLandmarks, setCalibrateTransf
       });
       camera.start();
     }
-  }, []);
+  }, [setCalibrateTransformation, setLandmarks]);
 
   return (
     <Webcam 

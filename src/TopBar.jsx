@@ -115,7 +115,7 @@ function MeshControlPanel({MT, MTC}) {
 		var combine = new THREE.Quaternion().multiplyQuaternions(yaw_q, pitch_q);
 		combine = new THREE.Quaternion().multiplyQuaternions(combine, roll_q);
 		setManualTransformation({trans: [x, y, z], rotate: combine});
-	}, [x_pos, y_pos, z_pos, yaw, pitch, roll]);
+	}, [x_pos, y_pos, z_pos, yaw, pitch, roll, setManualTransformation]);
 	
 	return (
 		<div style={{width:"22rem", marginTop:"1rem"}}>

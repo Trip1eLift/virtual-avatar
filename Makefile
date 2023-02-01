@@ -7,7 +7,7 @@ remove-build:
 build: remove-build
 	npm run build
 
-build-start: build
+dev: build
 	serve -s build
 
 deploy:

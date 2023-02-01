@@ -19,7 +19,7 @@ function FacemeshControl({landmarks, CT, Cal, MT, Skin}) {
   useEffect(() => {
     if (calibrate === false)
       return;
-    console.log("Calibration reset.")
+    console.log("Calibration reset.");
     const [up, right] = orientationVectors(landmarks[0], landmarks[158], landmarks[385]);
     //console.log(up, right);
     const trans = [-landmarks[0].x, -landmarks[0].y+0.02, -landmarks[0].z];
@@ -31,7 +31,7 @@ function FacemeshControl({landmarks, CT, Cal, MT, Skin}) {
 
     setTransformation({trans: trans, rotate: quaternion});
     setCalibrate(false);
-  }, [calibrate]);
+  }, [calibrate, landmarks, setCalibrate, setTransformation]);
 
   if (landmarks === undefined) {
     landmarks = mock_data;

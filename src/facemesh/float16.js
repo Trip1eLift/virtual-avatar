@@ -11,7 +11,7 @@ function Float32ToFloat16(float32) {
   const sign = (bits >> 16) & 0x8000;
   const mant = (bits >> 13) & 0x3ff;
   const expo_bit = (bits >> 23) & 0xff; // extract the exponent bits
-  if (expo_bit == 0) {
+  if (expo_bit === 0) {
     // zero special case
     return sign | 0x0 | 0x0;
   }
@@ -32,7 +32,7 @@ function Float16ToFloat32(float16) {
   const sign = (float16 & 0x8000) << 16;
   const mant = (float16 & 0x3ff) << 13;
   const expo_bit = (float16 >> 10) & 0x1f; // extract the exponent bits
-  if (expo_bit == 0) {
+  if (expo_bit === 0) {
     // zero special case
     int32View[0] = sign | 0x0 | 0x0;
     return floatView[0];

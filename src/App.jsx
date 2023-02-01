@@ -19,10 +19,11 @@ const backendUrl = "wss://virtualavatar-stream.trip1elift.com/";
  */
 
 export default function AppRoot() {
-  const [wsp, _] = useState(new WebSocketPeering());
+  const [wsp, ] = useState(new WebSocketPeering());
+  
   return (
     <App WSP={wsp} />
-  )
+  );
 }
 
 function App({WSP}) {
@@ -48,27 +49,22 @@ function App({WSP}) {
   const Stream = {getter: stream, setter: setStream};
 
   useEffect(() => {
-    if (typeof(remoteMedia.current) !== "undefined" && remoteMedia.current !== null) {
-      remoteMedia.current.srcObject = WSP.getRemoteStream();
-      remoteMedia.current.onloadedmetadata = function(e) {
-        remoteMedia.current.play();
-      };
-    }
+    WSP.setRemoteStream(remoteMedia);
     WSP.handleFacemeshData((buffer) => {
       //console.log(buffer);
       const obj = decodeFacemesh(buffer);
       setRemoteFacemesh(obj);
     });
-  }, []);
+  }, [WSP]);
 
-  // Send streaming data to remote
+  // // Send streaming data to remote
   useEffect(() => {
     // Encode and send data here
-    if (WSP !== undefined && landmarks !== undefined && WSP.dc_open === true) {
+    if (WSP !== undefined && landmarks !== undefined && WSP.dc.readyState === "open") {
       const buffer = encodeFacemesh(skin, manualTransformation, calibrateTransformation, landmarks);
       WSP.sendFacemeshData(buffer);
     }
-  }, [landmarks]);
+  }, [landmarks, WSP, calibrateTransformation, manualTransformation, skin]);
 
   function saveSettings() {
     const settings = {_Cal: Cal.getter, _CT: CT.getter, _MT: MT.getter, _MTC: MTC.getter, _Skin: Skin.getter}

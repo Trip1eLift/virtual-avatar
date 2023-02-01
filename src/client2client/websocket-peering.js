@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 const Peer_config = {
   required: {
     video: false,
-    audio: false
+    audio: true
   },
   iceServers: [
     {

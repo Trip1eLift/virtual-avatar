@@ -5,7 +5,7 @@ It only supports Chrome on a PC or Mac. It does not support Safari or Mobile dev
 
 ### 1. Visit page 
 
-When you first visit the page, it will ask you to grant access to your camera and microphone. Please select `Allow`. 
+When you first visit the page (https://virtualavatar.trip1elift.com/), it will ask you to grant access to your camera and microphone. Please select `Allow`. 
 ![1](./user-guide/1.png) 
 
 

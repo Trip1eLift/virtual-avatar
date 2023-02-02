@@ -13,33 +13,35 @@ import Paper from '@mui/material/Paper';
 import Draggable from 'react-draggable';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import About from './About';
 
-export default function TopBar({Cal, MT, MTC, Settings, Skin, Stream, WSP}) {
+export default function TopBar({Cal, MT, MTC, Settings, Skin}) {
 	const [meshControlDialog, setMeshControlDialog] = useState(false);
 	const [about, setAbout] = useState(false);
-	const [streamControlDialog, setStreamControlDialog] = useState(false);
 	const skin = Skin.getter;
 	const setSkin = Skin.setter;
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" style={{backgroundColor:"grey"}}>
         <Toolbar>
-					<MeshControlDraggableDialog open={meshControlDialog} setOpen={setMeshControlDialog} Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} />
-          <IconButton onClick={(e)=>setMeshControlDialog(true)} size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
+				<MeshControlDraggableDialog open={meshControlDialog} setOpen={setMeshControlDialog} Cal={Cal} MT={MT} MTC={MTC} Settings={Settings} />
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+            onClick={(e)=>setMeshControlDialog(true)}
+          >
             <MenuIcon />
           </IconButton>
-					<StreamControlDialog open={streamControlDialog} setOpen={setStreamControlDialog} Stream={Stream} WSP={WSP}/>
-					<Button color="inherit" onClick={(e)=>setStreamControlDialog(true)}>Stream</Button>
           <Typography variant="h6" component="div" align="center" sx={{ flexGrow: 1 }}>
             <div style={{cursor:"default"}}>Virtual Avatar</div>
           </Typography>
-					<Button component={Link} href="https://v1-virtualavatar.trip1elift.com/" style={{color: "white"}} >V1</Button>
+					<Button component={Link} href="https://virtualavatar.trip1elift.com/" style={{color: "white"}} >V2</Button>
 					<Button color="inherit" onClick={(e)=>setSkin(skin+1)}>Skin</Button>
           <Button color="inherit" onClick={(e)=>setAbout(true)}>About</Button>
 					<About open={about} setOpen={setAbout} />
@@ -112,12 +114,8 @@ function MeshControlPanel({MT, MTC}) {
 		yaw_q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -(yaw-50)/100*Math.PI*2);
 		const pitch_q = new THREE.Quaternion();
 		pitch_q.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (pitch-50)/100*Math.PI*2);
-		const roll_q = new THREE.Quaternion();
-		roll_q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), (roll-50)/100*Math.PI*2);
-		var combine = new THREE.Quaternion().multiplyQuaternions(yaw_q, pitch_q);
-		combine = new THREE.Quaternion().multiplyQuaternions(combine, roll_q);
-		setManualTransformation({trans: [x, y, z], rotate: combine});
-	}, [x_pos, y_pos, z_pos, yaw, pitch, roll, setManualTransformation]);
+		setManualTransformation({trans: [x, y, z], rotate: new THREE.Quaternion().multiplyQuaternions(yaw_q, pitch_q)});
+	}, [x_pos, y_pos, z_pos, yaw, pitch]);
 	
 	return (
 		<div style={{width:"22rem", marginTop:"1rem"}}>
@@ -143,57 +141,8 @@ function MeshControlPanel({MT, MTC}) {
       </Stack>
 			<Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
 				<div style={{width:"7rem"}}>Roll</div>
-				<Slider value={roll} onChange={(e, val)=>setRoll(val)} />
+				<Slider disabled value={roll} onChange={(e, val)=>setRoll(val)} />
       </Stack>
 		</div>
-	)
-}
-
-function StreamControlDialog({open, setOpen, Stream, WSP}) {
-	const [roomId, setRoomId] = useState();
-	const [disableRoomField, setDisableRoomField] = useState(false);
-	const stream = Stream.getter;
-	const setStream = Stream.setter;
-
-	function createRoom(event) {
-		setDisableRoomField(true);
-		WSP.ownerConn(stream.url, setRoomId);
-		setStream({start: true, url: stream.url});
-	}
-
-	function joinRoom(event) {
-		// Click joinRoom to release roomField if it was locked.
-		if (disableRoomField) {
-			setDisableRoomField(false);
-			setStream({start: false, url: stream.url});
-			return;
-		}
-
-		WSP.guestConn(stream.url, roomId);
-		setStream({start: true, url: stream.url});
-	}
-
-	function copyRoomUrl(event) {
-		console.log("This functionality will be added later...");
-	}
-
-	return (
-		<Dialog
-			open={open}
-			onClose={()=>setOpen(false)}
-			PaperComponent={DraggablePaper}
-      aria-labelledby="draggable-dialog-title"
-		>
-			<DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
-				Stream Control
-			</DialogTitle>
-			<TextField onChange={(e)=>setRoomId(e.target.value)} disabled={disableRoomField} InputLabelProps={{ shrink: true }} value={roomId} id="outlined-multiline-flexible" label="joining room id" multiline maxRows={4} style={{width: "94%", margin: "5px", marginLeft: "3%", marginRight: "3%"}} />
-			<DialogActions>
-				<Button onClick={createRoom}>Create Room</Button>
-				<Button onClick={joinRoom}>Join Room</Button>
-				<Button disabled onClick={copyRoomUrl}>Copy Room Url</Button>
-				<Button autoFocus onClick={()=>setOpen(false)}>Close</Button>
-			</DialogActions>
-    </Dialog>
 	)
 }

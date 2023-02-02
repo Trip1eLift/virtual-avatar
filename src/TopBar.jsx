@@ -189,7 +189,7 @@ function StreamControlDialog({open, setOpen, Stream, WSP}) {
 			<DialogActions>
 				<Button onClick={createRoom}>Create Room</Button>
 				<Button onClick={joinRoom}>Join Room</Button>
-				<Button onClick={copyRoomUrl}>Copy Room Url</Button>
+				<Button disabled onClick={copyRoomUrl}>Copy Room Url</Button>
 				<Button autoFocus onClick={()=>setOpen(false)}>Close</Button>
 			</DialogActions>
     </Dialog>

@@ -13,11 +13,9 @@ const backendUrl = "wss://virtualavatar-stream.trip1elift.com/";
 //const backendUrl = "ws://localhost:5000/";
 
 /**
- * TODO:
- * 1. Add copy link (domain name + query) http://localhost:3000/?room=3
- * 2. Handle domain name with query
- * 
- * TODO PRIO: find and fix memory leak (It happens without streaming, probably reltated to webgl)
+ * TODO: Easy back pressure test: every 1s, send an allow to the other side. If the other side hasn't recieved the allow for 3s, stop sending mesh buffer. Keep pinging allow however.
+ * TODO: Add copy link (domain name + query) http://localhost:3000/?room=3
+ * TODO: Handle domain name with query
  */
 
 export default function AppRoot() {
@@ -38,7 +36,6 @@ function App({WSP}) {
   const [manualTransformationControl, setManualTransformationControl] = useState({x_pos: 50, y_pos: 50, z_pos: 50, yaw: 50, pitch:50, roll: 50});
   const [skin, setSkin] = useState(0);
   const [stream, setStream] = useState({start: false, url: backendUrl});
-  
   const [remoteFacemesh, setRemoteFacemesh] = useState();
 
   const remoteMedia = useRef(null);
@@ -62,7 +59,7 @@ function App({WSP}) {
   // // Send streaming data to remote
   useEffect(() => {
     // Encode and send data here
-    if (WSP !== undefined && landmarks !== undefined && WSP.dc.readyState === "open") {
+    if (landmarks !== undefined && WSP.datachannelReady()) {
       const buffer = encodeFacemesh(skin, manualTransformation, calibrateTransformation, landmarks);
       WSP.sendFacemeshData(buffer);
     }

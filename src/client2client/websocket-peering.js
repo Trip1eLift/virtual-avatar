@@ -1,9 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 
-// TODO: resolve a bug if one user finish stream without refresh.
-//       the other user refresh, and they start streaming
-//       the other user cannot see this user's face because dc_open is not set to true or something else like onUserMedia?
-
 const Peer_config = {
   required: {
     video: false,
@@ -55,60 +51,15 @@ const MESSAGE_TYPE = {
 class WebSocketPeering {
   constructor(streamVideo = false) {
     console.log("Constructing wsp..."); // Debuging for constrcutor spamming
-    const peer = new RTCPeerConnection(Peer_config);
-    const remoteStream = new MediaStream();
-
-    peer.addEventListener("track", (event) => {
-      event.streams[0].getTracks().forEach((track) => {
-        remoteStream.addTrack(track);
-      });
-    })
-
-    peer.ondatachannel = (event) => {
-      event.channel.onmessage = (event) => {
-        // PeerConnection DataChannel Listener
-        //const payload = JSON.parse(event.data);
-
-        // if (payload.message_type === MESSAGE_TYPE.push) {
-        //   console.log(`[peer] recieved: ${payload.message}`);
-        // }
-        if (this.facemeshDataHandler !== undefined) { 
-          this.facemeshDataHandler(event.data);
-        }
-      };
-    };
-
-    const datachannel = peer.createDataChannel("data");
     
-    // 7. Peer connection established
-    datachannel.onopen = () => {
-      console.log("[peer] Connection established; Close websocket.");
-      this.socket.close(1000, "websocket is no longer needed."); // keep the socket alive for re-negotiation?
-      console.log(datachannel);
-
-      //console.log("7. Peer connection established");
-      if (typeof(this.mediaRef.current) !== "undefined" && this.mediaRef.current !== null) {
-        this.mediaRef.current.srcObject = remoteStream; // TODO: fix incognito mode issue here
-
-        if (streamVideo === true) {
-          // This is only needed for video streaming...
-          this.mediaRef.current.onloadedmetadata = function(e) {
-            this.mediaRef.current.play(); 
-          };
-        }
-      }
-    };
-    
-    datachannel.onclose = () => {
-      console.log("[peer] Connection close.");
-    };
-
-    this.socket = undefined;
-    this.peer = peer;
-    this.dc = datachannel;
-    this.remoteStream = remoteStream;
     this.streamVideo = streamVideo;
+    this.socket = undefined;
     this.facemeshDataHandler = undefined;
+
+    const remoteStream = new MediaStream();
+    this.remoteStream = remoteStream;
+
+    this.createNewRTC();
   }
 
   ownerConn(url, setRoomId) {
@@ -231,6 +182,71 @@ class WebSocketPeering {
     this.socket = socket;
   }
 
+  createNewRTC() {
+    const peer = new RTCPeerConnection(Peer_config);
+    this.peer = peer;
+    
+    peer.addEventListener("track", (event) => {
+      event.streams[0].getTracks().forEach((track) => {
+        this.remoteStream.addTrack(track);
+      });
+    });
+
+    peer.ondatachannel = (event) => {
+      event.channel.onmessage = (event) => {
+        // PeerConnection DataChannel Listener
+        //const payload = JSON.parse(event.data);
+
+        // if (payload.message_type === MESSAGE_TYPE.push) {
+        //   console.log(`[peer] recieved: ${payload.message}`);
+        // }
+        if (this.facemeshDataHandler !== undefined) { 
+          this.facemeshDataHandler(event.data);
+        }
+      };
+    };
+
+    const datachannel = peer.createDataChannel("data");
+    
+    // 7. Peer connection established
+    datachannel.onopen = () => {
+      console.log("[peer] Connection established; Close websocket.");
+      this.socket.close(1000, "websocket is no longer needed."); // keep the socket alive for re-negotiation?
+      console.log(datachannel);
+
+      //console.log("7. Peer connection established");
+      if (typeof(this.mediaRef.current) !== "undefined" && this.mediaRef.current !== null) {
+        this.mediaRef.current.srcObject = this.remoteStream;
+
+        if (this.streamVideo === true) {
+          // This is only needed for video streaming to play the video to frontend...
+          this.mediaRef.current.onloadedmetadata = function(e) {
+            this.mediaRef.current.play(); 
+          };
+        }
+      }
+    };
+    
+    datachannel.onclose = () => {
+      console.log("[peer] Connection close.");
+
+      window.location.reload(false); // I could not figure out other way on how to recover from dc hung up
+    };
+
+    this.dc = datachannel;
+  }
+
+  setForceUpdate(forceUpdate) {
+    this.forceUpdate = forceUpdate;
+  }
+
+  datachannelReady() {
+    if (this.dc !== undefined && this.dc.readyState === "open") {
+      return true;
+    }
+    return false;
+  }
+
   onUserMedia(stream) {
     if (this.streamVideo) {
       // Stream audio and video
@@ -245,16 +261,8 @@ class WebSocketPeering {
     }
   }
 
-  getRemoteStream() {
-    return this.remoteStream;
-  }
-
   setRemoteStream(mediaRef) {
     this.mediaRef = mediaRef;
-    // mediaRef.current.srcObject = this.remoteStream; // TODO: fix incognito mode issue here
-    // mediaRef.current.onloadedmetadata = function(e) {
-    //   mediaRef.current.play();
-    // };
   }
 
   boolStreamVideo() {
@@ -262,7 +270,7 @@ class WebSocketPeering {
   }
 
   sendFacemeshData(buffer) {
-    if (this.dc.readyState === "open") {
+    if (this.dc !== undefined && this.dc.readyState === "open") {
       this.dc.send(buffer);
     }
   }

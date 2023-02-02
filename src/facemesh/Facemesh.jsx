@@ -1,13 +1,11 @@
 import * as THREE from 'three';
 import mock_data from './landmarks-mock.json';
 import Landmarks_to_triangles from './landmarks2triangle';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 //import CustomShaderMaterial from './shader';
 //import { extend } from "@react-three/fiber";
 
 const l2t = new Landmarks_to_triangles();
-let local_geometry;
-let remote_geometry;
 
 function FacemeshControl({landmarks, CT, Cal, MT, Skin}) {
   const calibrate = Cal.getter;
@@ -44,17 +42,14 @@ function FacemeshControl({landmarks, CT, Cal, MT, Skin}) {
   );
 }
 
-function Facemesh({manualTransformation, transformation, points, skin, itemSize=3, local=true}) {
-  var geometry = local_geometry;
-  if (local === false) {
-    geometry = remote_geometry;
-  }
+function Facemesh({manualTransformation, transformation, points, skin, itemSize=3}) {
+  
   // setAttribute force upload to GPU on hook
-  if (geometry !== undefined)
-    geometry.dispose();
-  geometry = new THREE.BufferGeometry();
+  const [geometry, ] = useState(new THREE.BufferGeometry());
+  
   const dbPoints = l2t.doubleSidedPoints(points);
   const colors = l2t.generateColor(skin, dbPoints.length / 3);
+  geometry.dispose();
   geometry.setAttribute("position", new THREE.BufferAttribute(dbPoints, itemSize, false));
   //geometry.setAttribute("normal",  new THREE.BufferAttribute(normals, itemSize, true));
   geometry.setAttribute("color",  new THREE.BufferAttribute(colors, itemSize, false));

@@ -212,7 +212,7 @@ class WebSocketPeering {
     datachannel.onopen = () => {
       console.log("[peer] Connection established; Close websocket.");
       this.socket.close(1000, "websocket is no longer needed."); // keep the socket alive for re-negotiation?
-      console.log(datachannel);
+      //console.log(datachannel);
 
       //console.log("7. Peer connection established");
       if (typeof(this.mediaRef.current) !== "undefined" && this.mediaRef.current !== null) {
@@ -236,10 +236,6 @@ class WebSocketPeering {
     this.dc = datachannel;
   }
 
-  setForceUpdate(forceUpdate) {
-    this.forceUpdate = forceUpdate;
-  }
-
   datachannelReady() {
     if (this.dc !== undefined && this.dc.readyState === "open") {
       return true;
@@ -248,6 +244,7 @@ class WebSocketPeering {
   }
 
   onUserMedia(stream) {
+    // TODO: This is fixable for non refresh bug, just save the stream and attach it to the new peer
     if (this.streamVideo) {
       // Stream audio and video
       stream.getTracks().forEach((track) => {

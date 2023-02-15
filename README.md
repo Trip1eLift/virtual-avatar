@@ -1,6 +1,6 @@
 ​​# Virtual-Avatar
 
-A web-based virtual face renderer and streaming platform inspired by the Metaverse. 
+A web-based 3D face mesh renderer and streaming platform inspired by the Metaverse. Meta, please give me an offer...
 
 Please follow [userguide readme](./userguide/README.md) on how to use the website.
 

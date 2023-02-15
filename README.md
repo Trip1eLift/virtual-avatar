@@ -4,7 +4,7 @@ A web-based virtual face renderer and streaming platform inspired by the Metaver
 
 Please follow [User Guide.md](./userguide/README.md) on how to use the website.
 
-![userguide-11](./user-guide/11.png)
+![userguide-11](./userguide/11.png)
 
 Website is published on aws: https://virtualavatar.trip1elift.com/ 
 

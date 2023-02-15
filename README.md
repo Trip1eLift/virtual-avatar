@@ -2,7 +2,7 @@
 
 A web-based virtual face renderer and streaming platform inspired by the Metaverse. 
 
-Please follow [User Guide.md](./Userguide.md) on how to use the website.
+Please follow [User Guide.md](./userguide/README.md) on how to use the website.
 
 ![userguide-11](./user-guide/11.png)
 

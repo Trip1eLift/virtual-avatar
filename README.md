@@ -8,14 +8,18 @@ Please follow [userguide readme](./userguide/README.md) on how to use the websit
 
 Website is published on aws: https://virtualavatar.trip1elift.com/ 
 
-Resources: Route53, Certs, CloudFront, S3 
-
-Frontend Core Technologies: ReactJS, Google Mediapipe, ThreeJS, React-Three-Fiber, WebSocket, WebRTC, Terraform, AWS 
-
 ## Outlook 
 The virtual avatar has a streaming backend to support video chat using virtual face mesh. You can also use it as a static website to play around with your virtual 3D mesh face. The architecture design is shown in the diagram below. 
 
 ![Architecture Diagram](./architecture-diagram-v3.png) 
+
+Frontend Resources: Route53, Certs, CloudFront, S3 
+
+Frontend Core Technologies: ReactJS, Google Mediapipe, ThreeJS, React-Three-Fiber, WebSocket, WebRTC, Terraform, AWS
+
+Backend Resources: ALB, ECS Cluster, Fargate, Serverless Postgres Aurora
+
+Backend Core Technologies: Golang, Docker, Terraform, AWS
 
 Backend repo: https://github.com/Trip1eLift/virtual-avatar-stream 
 

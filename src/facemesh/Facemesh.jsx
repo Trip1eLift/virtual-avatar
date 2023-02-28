@@ -18,9 +18,12 @@ function FacemeshControl({landmarks, CT, Cal, MT, Skin}) {
     if (calibrate === false)
       return;
     console.log("Calibration reset.");
-    const [up, right] = orientationVectors(landmarks[0], landmarks[158], landmarks[385]);
-    //console.log(up, right);
-    const trans = [-landmarks[0].x, -landmarks[0].y+0.02, -landmarks[0].z];
+    // Nose:           1
+    // Left eye lash:  52
+    // Right eye lash: 282
+    const [up, right] = orientationVectors(landmarks[1], landmarks[52], landmarks[282]);
+    // Mid point nose: 5
+    const trans = [-landmarks[5].x, -landmarks[5].y, -landmarks[5].z];
     const quaternion = new THREE.Quaternion();
     quaternion.setFromUnitVectors( up, new THREE.Vector3(0, 1, 0) );
     const quaternion2 = new THREE.Quaternion();

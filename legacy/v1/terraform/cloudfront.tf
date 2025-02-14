@@ -1,8 +1,8 @@
 # Cloudfront distribution for main s3 site.
 resource "aws_cloudfront_distribution" "root_s3_distribution" {
   origin {
-    domain_name = aws_s3_bucket_website_configuration.root_bucket.website_endpoint
-    origin_id = "S3-${var.bucket_name}"
+    domain_name = aws_s3_bucket_website_configuration.website_config.website_endpoint
+    origin_id   = "S3-${aws_s3_bucket.root_bucket.bucket}"
 
     custom_origin_config {
       http_port = 80
